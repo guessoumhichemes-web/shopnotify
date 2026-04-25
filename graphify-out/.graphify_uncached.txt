@@ -1,0 +1,3 @@
+/Users/hichem/Desktop/shopnotify/README.md
+/Users/hichem/Desktop/shopnotify/ShopNotify.md
+/Users/hichem/Desktop/shopnotify/public/index.html

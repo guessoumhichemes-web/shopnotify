@@ -1,0 +1,875 @@
+{
+  "nodes": [
+    {
+      "id": "readme_shopnotify",
+      "label": "ShopNotify README",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_shopnotify",
+      "label": "ShopNotify Technical Doc",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_dashboard",
+      "label": "ShopNotify Web Dashboard",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_baileys",
+      "label": "@whiskeysockets/baileys WhatsApp Client",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_whatsappwebjs",
+      "label": "whatsapp-web.js (Replaced Library)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_express",
+      "label": "Express HTTP Server",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_shopify_webhook",
+      "label": "Shopify Webhook Integration",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_hmac_verification",
+      "label": "HMAC Webhook Signature Verification",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_language_detection",
+      "label": "Multilingual Auto-Detection (FR/ES)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_order_status_flow",
+      "label": "Order Status State Machine",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_inmemory_store",
+      "label": "In-Memory Order Store",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_templates_system",
+      "label": "Multilingual Message Templates (FR/ES)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_reminder_system",
+      "label": "Automatic Reminder After 2h",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_src_indexjs",
+      "label": "src/index.js - Express Server & Routes",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_src_whatsappjs",
+      "label": "src/whatsapp.js - WhatsApp Baileys Client",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_src_shopifyjs",
+      "label": "src/shopify.js - Shopify Webhook Handler",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_src_storejs",
+      "label": "src/store.js - In-Memory Data Store",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_src_templatesjs",
+      "label": "src/templates.js - Message Templates",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_axios",
+      "label": "axios HTTP Client",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_qrcode",
+      "label": "qrcode Library",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_pino",
+      "label": "pino Logger",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_dotenv",
+      "label": "dotenv Environment Variables",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_ngrok",
+      "label": "ngrok Tunnel for Local Webhooks",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_rationale_baileys_migration",
+      "label": "Rationale: Migrate to Baileys over whatsapp-web.js",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_rationale_inmemory",
+      "label": "Rationale: In-Memory Store (MVP Trade-off)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_circular_dep_fix",
+      "label": "Bug Fix: Circular Dependency shopify.js/whatsapp.js",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "shopnotifymd_phone_matching",
+      "label": "Flexible Phone Number Matching (endsWith)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_api_orders",
+      "label": "API: GET /api/orders",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_api_stats",
+      "label": "API: GET /api/stats",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_api_whatsapp_status",
+      "label": "API: GET /api/whatsapp/status",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_api_send_order",
+      "label": "API: POST /api/send/:orderId",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_api_templates",
+      "label": "API: GET/PUT /api/templates",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_pollwa",
+      "label": "pollWA() - WhatsApp Status Polling (3s interval)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_loaddata",
+      "label": "loadData() - Orders & Stats Loader (10s interval)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_qr_overlay",
+      "label": "QR Code Scan Overlay UI",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_template_editor",
+      "label": "Template Editor UI (FR/ES)",
+      "file_type": "document",
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "shopnotifymd_shopnotify",
+      "target": "readme_shopnotify",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_rationale_baileys_migration",
+      "target": "shopnotifymd_baileys",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 15",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_rationale_baileys_migration",
+      "target": "shopnotifymd_whatsappwebjs",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 85-92",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_rationale_inmemory",
+      "target": "shopnotifymd_inmemory_store",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 101",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_baileys",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 27",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_shopifyjs",
+      "target": "shopnotifymd_shopify_webhook",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 28",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_shopifyjs",
+      "target": "shopnotifymd_hmac_verification",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 28",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_shopifyjs",
+      "target": "shopnotifymd_language_detection",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 28",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_storejs",
+      "target": "shopnotifymd_inmemory_store",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 29",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_templatesjs",
+      "target": "shopnotifymd_templates_system",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 30",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_express",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_src_whatsappjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_src_shopifyjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_src_storejs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_src_templatesjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 26",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_circular_dep_fix",
+      "target": "shopnotifymd_src_shopifyjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 189",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_circular_dep_fix",
+      "target": "shopnotifymd_src_whatsappjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 189",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_order_status_flow",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 104-111",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_reminder_system",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 100-101",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_phone_matching",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 113-116",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_qrcode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 44",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_whatsappjs",
+      "target": "shopnotifymd_pino",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 43",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_shopifyjs",
+      "target": "shopnotifymd_axios",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 46",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_src_indexjs",
+      "target": "shopnotifymd_dotenv",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 47",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_dashboard",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 30",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_pollwa",
+      "target": "indexhtml_api_whatsapp_status",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 779-808",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_loaddata",
+      "target": "indexhtml_api_orders",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 569-595",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_loaddata",
+      "target": "indexhtml_api_stats",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 569-595",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_dashboard",
+      "target": "indexhtml_api_send_order",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 596-604",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_template_editor",
+      "target": "indexhtml_api_templates",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 714-771",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_qr_overlay",
+      "target": "indexhtml_pollwa",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 794-800",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_api_orders",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 57",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_api_stats",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 58",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_api_whatsapp_status",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 56",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_api_send_order",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 60",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_api_templates",
+      "target": "shopnotifymd_src_indexjs",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 63-65",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_templates_system",
+      "target": "shopnotifymd_language_detection",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 120-136",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_baileys",
+      "target": "shopnotifymd_whatsappwebjs",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 85-93",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_inmemory_store",
+      "target": "shopnotifymd_src_storejs",
+      "relation": "shares_data_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 29",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_shopnotify",
+      "target": "shopnotifymd_ngrok",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/README.md",
+      "source_location": "line 57-61",
+      "weight": 1.0
+    },
+    {
+      "source": "shopnotifymd_shopnotify",
+      "target": "shopnotifymd_ngrok",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "/Users/hichem/Desktop/shopnotify/ShopNotify.md",
+      "source_location": "line 202",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_template_editor",
+      "target": "shopnotifymd_templates_system",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 698-771",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_qr_overlay",
+      "target": "shopnotifymd_baileys",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/hichem/Desktop/shopnotify/public/index.html",
+      "source_location": "line 253-269",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_order_confirmation_flow",
+      "label": "Full Order Confirmation Flow",
+      "nodes": [
+        "shopnotifymd_shopify_webhook",
+        "shopnotifymd_src_whatsappjs",
+        "shopnotifymd_order_status_flow",
+        "shopnotifymd_inmemory_store",
+        "shopnotifymd_language_detection"
+      ],
+      "relation": "participates_in_flow",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "hyperedge_multilingual_messaging",
+      "label": "Multilingual WhatsApp Messaging System",
+      "nodes": [
+        "shopnotifymd_language_detection",
+        "shopnotifymd_templates_system",
+        "shopnotifymd_src_whatsappjs",
+        "shopnotifymd_src_templatesjs"
+      ],
+      "relation": "collaborates_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "hyperedge_dashboard_realtime",
+      "label": "Real-Time Dashboard Data Pipeline",
+      "nodes": [
+        "indexhtml_loaddata",
+        "indexhtml_pollwa",
+        "indexhtml_api_orders",
+        "indexhtml_api_stats",
+        "indexhtml_api_whatsapp_status"
+      ],
+      "relation": "forms_realtime_pipeline",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0
+    }
+  ]
+}

@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShopNotify</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #25D366;
+  --green-dim: rgba(37,211,102,0.12);
+  --green-border: rgba(37,211,102,0.35);
+  --shopify: #96BF48;
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22263a;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0f0f0;
+  --muted: #8892a4;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface); border-bottom: 0.5px solid var(--border);
+  padding: 0 24px; height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; z-index: 10;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 15px; font-weight: 700; letter-spacing: -0.5px;
+}
+.logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--green), var(--shopify));
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+}
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.wa-badge {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 12px; border: 0.5px solid; transition: all 0.3s;
+}
+.wa-badge.connected { background: var(--green-dim); border-color: var(--green-border); color: var(--green); }
+.wa-badge.disconnected { background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.3); color: #ff6b6b; }
+.wa-badge.qr { background: rgba(255,171,0,0.1); border-color: rgba(255,171,0,0.3); color: #ffab00; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+.store-label { font-size: 12px; color: var(--muted); }
+
+/* LAYOUT */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px; background: var(--surface);
+  border-right: 0.5px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; overflow-y: auto;
+  padding: 18px 0 12px;
+}
+.sidebar-label {
+  font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--muted); padding: 0 16px; margin-bottom: 5px;
+}
+.sidebar-section { margin-bottom: 22px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; font-size: 13px; color: var(--muted);
+  cursor: pointer; border-left: 2px solid transparent;
+  transition: all 0.15s; user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.nav-item.active { background: var(--green-dim); color: var(--green); border-left-color: var(--green); }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.wa-info-box {
+  margin: auto 12px 0;
+  background: var(--green-dim); border: 0.5px solid var(--green-border);
+  border-radius: 10px; padding: 12px;
+}
+.wa-info-title { font-size: 11px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+.wa-info-phone { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+.wa-info-status { font-size: 11px; color: var(--green); margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 22px; }
+.section { display: none; }
+.section.visible { display: block; }
+
+/* METRICS */
+.metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.metric-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 12px; padding: 16px;
+}
+.metric-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.4; }
+.metric-value { font-size: 28px; font-weight: 700; font-family: 'Space Mono', monospace; line-height: 1; }
+.metric-sub { font-size: 11px; margin-top: 6px; }
+.up { color: var(--green); }
+
+/* SEC TITLE */
+.sec-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 14px; margin-top: 4px; }
+
+/* FLOW */
+.flow { display: flex; align-items: center; gap: 0; overflow-x: auto; padding-bottom: 6px; margin-bottom: 24px; }
+.flow-node { flex-shrink: 0; }
+.flow-box {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; text-align: center; min-width: 120px;
+}
+.flow-box.green { border-color: var(--green-border); background: var(--green-dim); }
+.flow-box.shopify { border-color: rgba(150,191,72,0.4); background: rgba(150,191,72,0.08); }
+.flow-icon { font-size: 24px; margin-bottom: 7px; }
+.flow-title { font-size: 13px; font-weight: 600; }
+.flow-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.flow-arrow { padding: 0 10px; color: var(--muted); font-size: 18px; flex-shrink: 0; }
+
+/* ORDERS */
+.orders-list { display: flex; flex-direction: column; gap: 8px; }
+.order-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: border-color 0.15s;
+}
+.order-card:hover { border-color: var(--green-border); }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.order-info { flex: 1; min-width: 0; }
+.order-name { font-size: 13px; font-weight: 500; }
+.order-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.order-right { text-align: right; flex-shrink: 0; }
+.order-amount { font-size: 13px; font-weight: 700; font-family: 'Space Mono', monospace; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 9px; border-radius: 20px; margin-top: 5px; }
+.b-pending  { background: rgba(255,171,0,0.12); color: #ffab00; border: 0.5px solid rgba(255,171,0,0.3); }
+.b-sent     { background: rgba(100,150,255,0.12); color: #8baeff; border: 0.5px solid rgba(100,150,255,0.3); }
+.b-confirmed{ background: var(--green-dim); color: var(--green); border: 0.5px solid var(--green-border); }
+.b-cancelled{ background: rgba(255,107,107,0.12); color: #ff6b6b; border: 0.5px solid rgba(255,107,107,0.3); }
+.b-reminded { background: rgba(255,171,0,0.12); color: #ffab00; border: 0.5px solid rgba(255,171,0,0.3); }
+.action-btn {
+  background: var(--green-dim); border: 0.5px solid var(--green-border);
+  color: var(--green); padding: 6px 13px; border-radius: 7px;
+  font-size: 11px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: background 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.action-btn:hover { background: rgba(37,211,102,0.22); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.orders-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.refresh-btn {
+  background: transparent; border: 0.5px solid var(--border);
+  color: var(--muted); padding: 5px 13px; border-radius: 7px;
+  font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+}
+.refresh-btn:hover { border-color: var(--green-border); color: var(--green); }
+
+/* CHAT */
+.chat-wrap {
+  display: grid; grid-template-columns: 210px 1fr;
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 12px; overflow: hidden; height: 420px;
+}
+.chat-list { border-right: 0.5px solid var(--border); overflow-y: auto; }
+.chat-list-hdr { padding: 12px 14px; border-bottom: 0.5px solid var(--border); font-size: 11px; color: var(--muted); }
+.chat-item { padding: 11px 14px; cursor: pointer; border-bottom: 0.5px solid var(--border); transition: background 0.1s; }
+.chat-item:hover, .chat-item.active { background: var(--green-dim); }
+.chat-item-name { font-size: 12px; font-weight: 500; }
+.chat-item-preview { font-size: 10px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-item-time { font-size: 9px; color: var(--muted); margin-top: 3px; }
+.chat-area { display: flex; flex-direction: column; }
+.chat-hdr { padding: 12px 16px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.chat-name { font-size: 13px; font-weight: 500; }
+.chat-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.messages { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: 72%; padding: 9px 13px; border-radius: 10px; font-size: 12px; line-height: 1.55; }
+.msg-bot { background: var(--surface2); border: 0.5px solid var(--border); align-self: flex-start; border-bottom-left-radius: 3px; }
+.msg-customer { background: rgba(37,211,102,0.15); border: 0.5px solid rgba(37,211,102,0.3); align-self: flex-end; color: #d5f5e3; border-bottom-right-radius: 3px; }
+.msg-time { font-size: 9px; color: var(--muted); margin-top: 4px; }
+.chat-input-row { padding: 10px 14px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; }
+.chat-input {
+  flex: 1; background: var(--surface2); border: 0.5px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; outline: none;
+}
+.chat-input:focus { border-color: var(--green-border); }
+.send-btn {
+  background: var(--green); color: #000; border: none;
+  border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+
+/* TEMPLATES */
+.template-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.template-name { font-size: 13px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+.template-body { background: rgba(37,211,102,0.06); border: 0.5px solid rgba(37,211,102,0.2); border-radius: 9px; padding: 12px; font-size: 12px; line-height: 1.7; color: #c8e6cc; }
+.tvar { color: var(--green); font-weight: 600; }
+.add-btn { background: var(--green); color: #000; border: none; border-radius: 9px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px; }
+
+/* CONFIG */
+.config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.config-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 18px; }
+.config-title { font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+.field { margin-bottom: 12px; }
+.field-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+.field-input { width: 100%; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 7px; padding: 8px 11px; font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; outline: none; }
+.field-input:focus { border-color: var(--green-border); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+.toggle-row:last-child { border-bottom: none; }
+.toggle { width: 34px; height: 19px; background: var(--green); border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+.toggle::after { content: ''; position: absolute; width: 15px; height: 15px; background: #fff; border-radius: 50%; top: 2px; right: 2px; transition: right 0.2s; }
+.toggle.off { background: var(--surface2); border: 0.5px solid var(--border); }
+.toggle.off::after { right: 17px; }
+
+/* QR OVERLAY */
+.qr-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+.qr-modal { background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px; padding: 32px; text-align: center; max-width: 340px; width: 90%; }
+.qr-modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.qr-modal p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.qr-img-wrap { background: #fff; border-radius: 12px; padding: 14px; display: inline-block; margin-bottom: 20px; }
+.qr-img-wrap img { width: 200px; height: 200px; display: block; }
+.qr-steps { text-align: left; }
+.qr-step { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+.qr-num { background: var(--surface2); border-radius: 50%; width: 20px; height: 20px; min-width: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--text); }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 20px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast { position: fixed; bottom: 22px; right: 22px; background: var(--surface); border-radius: 9px; padding: 11px 18px; font-size: 13px; display: none; z-index: 200; animation: fadeUp 0.2s ease; }
+@keyframes fadeUp { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.empty { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 13px; }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- QR Overlay -->
+<div class="qr-overlay" id="qr-overlay" style="display:none;">
+  <div class="qr-modal">
+    <h2>📱 Connecter WhatsApp</h2>
+    <p>Scanne ce QR code depuis WhatsApp sur ton téléphone pour activer les notifications automatiques.</p>
+    <div id="qr-content">
+      <div class="spinner"></div>
+      <p style="color:var(--muted);font-size:12px;">Génération du QR code...</p>
+    </div>
+    <div class="qr-steps">
+      <div class="qr-step"><div class="qr-num">1</div>Ouvre WhatsApp sur ton téléphone</div>
+      <div class="qr-step"><div class="qr-num">2</div>Appuie sur ⋮ → "Appareils liés"</div>
+      <div class="qr-step"><div class="qr-num">3</div>Sélectionne "Lier un appareil"</div>
+      <div class="qr-step"><div class="qr-num">4</div>Scanne le QR ci-dessus</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    ShopNotify
+  </div>
+  <div class="topbar-right">
+    <div class="wa-badge disconnected" id="wa-badge">
+      <div class="dot pulse"></div>
+      <span id="wa-badge-text">Connexion...</span>
+    </div>
+    <div class="store-label" id="store-label">Boutique: —</div>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Principal</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">◈</span> Dashboard</div>
+      <div class="nav-item" onclick="nav('stats',this)"><span class="nav-icon">◑</span> Statistiques</div>
+      <div class="nav-item" onclick="nav('orders',this)"><span class="nav-icon">▦</span> Commandes</div>
+      <div class="nav-item" onclick="nav('chats',this)"><span class="nav-icon">◎</span> Conversations</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Paramètres</div>
+      <div class="nav-item" onclick="nav('templates',this)"><span class="nav-icon">▤</span> Templates WA</div>
+      <div class="nav-item" onclick="nav('config',this)"><span class="nav-icon">⊡</span> Configuration</div>
+    </div>
+    <div class="wa-info-box">
+      <div class="wa-info-title">WhatsApp Business</div>
+      <div class="wa-info-phone" id="sidebar-phone">Non connecté</div>
+      <div class="wa-info-status"><div class="dot pulse"></div><span id="sidebar-status">En attente</span></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="section visible" id="sec-dashboard">
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Commandes aujourd'hui</div>
+          <div class="metric-value" id="m-total">—</div>
+          <div class="metric-sub up" id="m-total-sub"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Messages envoyés</div>
+          <div class="metric-value up" id="m-sent">—</div>
+          <div class="metric-sub up" id="m-sent-sub"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Confirmations reçues</div>
+          <div class="metric-value up" id="m-confirmed">—</div>
+          <div class="metric-sub up" id="m-conf-sub"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">En attente</div>
+          <div class="metric-value" id="m-pending">—</div>
+          <div class="metric-sub" style="color:var(--muted);">à relancer</div>
+        </div>
+      </div>
+
+      <div class="sec-title">Flux automatisé</div>
+      <div class="flow">
+        <div class="flow-node"><div class="flow-box shopify"><div class="flow-icon">🛍️</div><div class="flow-title">Shopify</div><div class="flow-sub">Nouvelle commande</div></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box"><div class="flow-icon">⚙️</div><div class="flow-title">Traitement</div><div class="flow-sub">Webhook reçu</div></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box green"><div class="flow-icon">💬</div><div class="flow-title">WhatsApp</div><div class="flow-sub">Message envoyé</div></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box"><div class="flow-icon">👤</div><div class="flow-title">Client répond</div><div class="flow-sub">OUI / NON</div></div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box shopify"><div class="flow-icon">✅</div><div class="flow-title">Shopify MàJ</div><div class="flow-sub">Statut mis à jour</div></div></div>
+      </div>
+
+      <div class="sec-title">Activité récente</div>
+      <div class="orders-list" id="dash-orders">
+        <div class="empty"><div class="empty-icon">📦</div>En attente des premières commandes…</div>
+      </div>
+    </div>
+
+    <!-- STATISTIQUES -->
+    <div class="section" id="sec-stats">
+      <div class="sec-title">Statistiques des commandes</div>
+
+      <!-- Chiffres clés -->
+      <div class="metrics" style="margin-bottom:20px">
+        <div class="metric-card">
+          <div class="metric-label">Total commandes</div>
+          <div class="metric-value" id="st-total">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Confirmées ✅</div>
+          <div class="metric-value up" id="st-confirmed">—</div>
+          <div class="metric-sub up" id="st-confirmed-pct"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Annulées ❌</div>
+          <div class="metric-value" style="color:#ff6b6b" id="st-cancelled">—</div>
+          <div class="metric-sub" style="color:#ff6b6b" id="st-cancelled-pct"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sans réponse ⏳</div>
+          <div class="metric-value" style="color:#ffab00" id="st-pending">—</div>
+          <div class="metric-sub" style="color:#ffab00" id="st-pending-pct"></div>
+        </div>
+      </div>
+
+      <!-- Barre de progression visuelle -->
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">Répartition des commandes</div>
+        <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px;margin-bottom:12px" id="st-bar">
+          <div style="background:var(--green);flex:0;transition:flex 0.5s ease" id="bar-confirmed"></div>
+          <div style="background:#ff6b6b;flex:0;transition:flex 0.5s ease" id="bar-cancelled"></div>
+          <div style="background:#ffab00;flex:0;transition:flex 0.5s ease" id="bar-pending"></div>
+          <div style="background:var(--surface2);flex:1" id="bar-empty"></div>
+        </div>
+        <div style="display:flex;gap:20px;font-size:12px">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>Confirmées</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ff6b6b;display:inline-block"></span>Annulées</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ffab00;display:inline-block"></span>Sans réponse</span>
+        </div>
+      </div>
+
+      <!-- Taux de réponse -->
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">Taux de réponse</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+            <svg viewBox="0 0 80 80" style="transform:rotate(-90deg)">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--surface2)" stroke-width="10"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="var(--green)" stroke-width="10"
+                stroke-dasharray="201" id="st-rate-circle" stroke-dashoffset="201" stroke-linecap="round"
+                style="transition:stroke-dashoffset 0.6s ease"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'Space Mono',monospace" id="st-rate-text">—</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:22px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green)" id="st-rate-big">—%</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">des clients ont répondu à la demande de confirmation</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:8px" id="st-rate-detail"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste commandes sans réponse -->
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">⏳ Commandes sans réponse</div>
+        <div id="st-no-reply-list"><div class="empty"><div class="empty-icon">✅</div>Aucune commande en attente</div></div>
+      </div>
+    </div>
+
+    <!-- COMMANDES -->
+    <div class="section" id="sec-orders">
+      <div class="orders-header">
+        <div class="sec-title" style="margin:0;">Toutes les commandes</div>
+        <button class="refresh-btn" onclick="loadData()">↻ Rafraîchir</button>
+      </div>
+      <div class="orders-list" id="all-orders">
+        <div class="empty"><div class="empty-icon">📦</div>Aucune commande</div>
+      </div>
+    </div>
+
+    <!-- CONVERSATIONS -->
+    <div class="section" id="sec-chats">
+      <div class="sec-title">Conversations WhatsApp</div>
+      <div class="chat-wrap">
+        <div class="chat-list">
+          <div class="chat-list-hdr" id="chat-count">0 conversation</div>
+          <div id="chat-list-items"><div class="empty" style="padding:24px 12px;font-size:12px;">Aucune conversation</div></div>
+        </div>
+        <div class="chat-area">
+          <div class="chat-hdr">
+            <div class="avatar" id="chat-avatar" style="background:rgba(37,211,102,0.2);color:var(--green);width:32px;height:32px;font-size:11px;">—</div>
+            <div>
+              <div class="chat-name" id="chat-name">Sélectionne une conversation</div>
+              <div class="chat-sub" id="chat-sub">—</div>
+            </div>
+          </div>
+          <div class="messages" id="messages">
+            <div class="empty" style="margin:auto;"><div class="empty-icon">💬</div>Sélectionne une conversation</div>
+          </div>
+          <div class="chat-input-row">
+            <input class="chat-input" type="text" placeholder="Écrire un message manuel…" id="msg-input" onkeydown="if(event.key==='Enter')sendMsg()" />
+            <button class="send-btn" onclick="sendMsg()">Envoyer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div class="section" id="sec-templates">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div class="sec-title" style="margin:0">📝 Messages automatiques</div>
+        <div style="display:flex;gap:10px">
+          <select id="template-lang" onchange="loadTemplateEditor()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;outline:none">
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+          </select>
+          <button onclick="resetTemplates()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.15s">↺ Défauts</button>
+          <button onclick="saveTemplates()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s">💾 Sauvegarder</button>
+        </div>
+      </div>
+
+      <div id="template-editor" style="display:flex;flex-direction:column;gap:16px"></div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="section" id="sec-config">
+      <div class="sec-title">Configuration</div>
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-title">🛍️ Shopify</div>
+          <div class="field"><div class="field-label">Store URL</div><input class="field-input" type="text" placeholder="ma-boutique.myshopify.com" id="cfg-store" /></div>
+          <div class="field"><div class="field-label">Access Token</div><input class="field-input" type="password" placeholder="shpat_••••••••••••••••" id="cfg-token" /></div>
+          <div class="field"><div class="field-label">Webhook Secret</div><input class="field-input" type="password" placeholder="••••••••••••" id="cfg-secret" /></div>
+        </div>
+        <div class="config-card">
+          <div class="config-title">📱 WhatsApp</div>
+          <div class="field"><div class="field-label">Statut de connexion</div><input class="field-input" type="text" id="cfg-wa-status" readonly style="color:var(--green);" value="Chargement…" /></div>
+          <div class="field"><div class="field-label">Numéro connecté</div><input class="field-input" type="text" id="cfg-wa-phone" readonly value="—" /></div>
+          <div style="margin-top:10px;"><button class="action-btn" onclick="showQR()" style="width:100%;text-align:center;">📱 Reconnecter WhatsApp</button></div>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-title">⚙️ Automatisations</div>
+        <div class="toggle-row"><span>Envoyer WA à chaque nouvelle commande</span><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+        <div class="toggle-row"><span>Relance automatique après 2h sans réponse</span><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+        <div class="toggle-row"><span>Notification WA à l'expédition</span><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+        <div class="toggle-row"><span>Mettre à jour Shopify selon réponse client</span><div class="toggle" onclick="this.classList.toggle('off')"></div></div>
+        <div class="toggle-row"><span>Alertes si échec d'envoi</span><div class="toggle off" onclick="this.classList.toggle('off')"></div></div>
+      </div>
+      <div style="margin-top:14px;"><button class="add-btn" onclick="saveConfig()">Sauvegarder</button></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS = ['#25D366','#96BF48','#ffab00','#8baeff','#d884ff','#ff9f6b'];
+function initials(n){ return (n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function colorFor(n){ let h=0; for(let c of(n||'')) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
+function ago(iso){
+  const d=Date.now()-new Date(iso), m=Math.floor(d/60000);
+  if(m<1) return 'À l\'instant';
+  if(m<60) return `Il y a ${m} min`;
+  const h=Math.floor(m/60);
+  if(h<24) return `Il y a ${h}h`;
+  return `Il y a ${Math.floor(h/24)}j`;
+}
+const BADGE_MAP = {
+  pending:   ['b-pending',  '● En attente'],
+  sent:      ['b-sent',     '📤 Envoyé'],
+  confirmed: ['b-confirmed','✓ Confirmé'],
+  cancelled: ['b-cancelled','✗ Annulé'],
+  reminded:  ['b-reminded', '🔔 Relancé'],
+  failed:    ['b-cancelled','⚠ Échec'],
+};
+function toast(msg, ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.border=`0.5px solid ${ok?'var(--green)':'#ff6b6b'}`;
+  t.style.color=ok?'var(--green)':'#ff6b6b';
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+function nav(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('sec-'+id).classList.add('visible');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  if(id==='templates') loadTemplateEditor();
+  if(id==='stats') loadStats();
+}
+function orderCard(o){
+  const color=colorFor(o.customerName);
+  const [bc,bl]=BADGE_MAP[o.status]||['b-pending','● ?'];
+  const needBtn=['pending','failed'].includes(o.status);
+  return `<div class="order-card">
+    <div class="avatar" style="background:${color}22;color:${color};">${initials(o.customerName)}</div>
+    <div class="order-info">
+      <div class="order-name">${o.customerName}</div>
+      <div class="order-detail">#${o.shopifyId} · ${o.items?.[0]?.name||''} · ${ago(o.createdAt)}</div>
+    </div>
+    <div class="order-right">
+      <div class="order-amount">${o.total} ${o.currency}</div>
+      <div class="badge ${bc}">${bl}</div>
+    </div>
+    ${needBtn?`<button class="action-btn" onclick="sendWA('${o.id}',this)">📤 Envoyer WA</button>`:''}
+  </div>`;
+}
+async function loadData(){
+  try {
+    const [orders,stats]=await Promise.all([
+      fetch('/api/orders').then(r=>r.json()),
+      fetch('/api/stats').then(r=>r.json()),
+    ]);
+    document.getElementById('m-total').textContent=stats.totalOrders;
+    document.getElementById('m-sent').textContent=stats.sent;
+    document.getElementById('m-confirmed').textContent=stats.confirmed;
+    document.getElementById('m-pending').textContent=stats.pending;
+    document.getElementById('m-sent-sub').textContent=stats.sent>0?Math.round(stats.sent/Math.max(stats.totalOrders,1)*100)+'% taux d\'envoi':'';
+    document.getElementById('m-conf-sub').textContent=stats.responseRate+'% taux réponse';
+    const dash=document.getElementById('dash-orders');
+    dash.innerHTML=orders.length?orders.slice(0,5).map(orderCard).join(''):'<div class="empty"><div class="empty-icon">📦</div>En attente des premières commandes…</div>';
+    const all=document.getElementById('all-orders');
+    all.innerHTML=orders.length?orders.map(orderCard).join(''):'<div class="empty"><div class="empty-icon">📦</div>Aucune commande</div>';
+    const withPhone=orders.filter(o=>o.phone);
+    document.getElementById('chat-count').textContent=withPhone.length+' conversation'+(withPhone.length!==1?'s':'');
+    const chatList=document.getElementById('chat-list-items');
+    chatList.innerHTML=withPhone.length?withPhone.slice(0,20).map(o=>`
+      <div class="chat-item" onclick='openChat(${JSON.stringify(o)},this)'>
+        <div class="chat-item-name">${o.customerName}</div>
+        <div class="chat-item-preview">Commande #${o.shopifyId} · ${o.total} ${o.currency}</div>
+        <div class="chat-item-time">${ago(o.createdAt)}</div>
+      </div>`).join(''):'<div class="empty" style="padding:24px 12px;font-size:12px;">Aucune conversation</div>';
+  } catch(e){ console.error(e); }
+}
+async function sendWA(id,btn){
+  btn.disabled=true; btn.textContent='⏱ Envoi…';
+  try {
+    const r=await fetch(`/api/send/${id}`,{method:'POST'});
+    const d=await r.json();
+    if(d.success){ toast('✅ Message WhatsApp envoyé !'); loadData(); }
+    else { toast('❌ '+d.error,false); btn.disabled=false; btn.textContent='📤 Envoyer WA'; }
+  } catch { toast('❌ Erreur réseau',false); btn.disabled=false; btn.textContent='📤 Envoyer WA'; }
+}
+function openChat(order,el){
+  document.querySelectorAll('.chat-item').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const color=colorFor(order.customerName);
+  const av=document.getElementById('chat-avatar');
+  av.textContent=initials(order.customerName);
+  av.style.background=color+'22'; av.style.color=color;
+  document.getElementById('chat-name').textContent=order.customerName;
+  document.getElementById('chat-sub').textContent=`Commande #${order.shopifyId} · ${order.total} ${order.currency}`;
+  const items=(order.items||[]).map(i=>`• ${i.name} x${i.quantity}`).join('\n');
+  const botMsg=`Bonjour ${order.customerName.split(' ')[0]} 👋\n\nNous avons bien reçu votre commande #${order.shopifyId} :\n\n${items}\n\n💰 Total : ${order.total} ${order.currency}\n\nRépondez OUI pour confirmer ✅ ou NON pour annuler ❌`;
+  const msgs=document.getElementById('messages');
+  msgs.innerHTML=`<div class="msg msg-bot">${botMsg.replace(/\n/g,'<br>')}<div class="msg-time">${ago(order.createdAt)}</div></div>`;
+  if(order.status==='confirmed') msgs.innerHTML+=`<div class="msg msg-customer">OUI<div class="msg-time">Client</div></div><div class="msg msg-bot">Parfait ! ✅ Votre commande est confirmée. Merci !<div class="msg-time">Bot</div></div>`;
+  else if(order.status==='cancelled') msgs.innerHTML+=`<div class="msg msg-customer">NON<div class="msg-time">Client</div></div><div class="msg msg-bot">Commande annulée. N'hésitez pas à nous contacter si c'est une erreur.<div class="msg-time">Bot</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function sendMsg(){
+  const input=document.getElementById('msg-input');
+  const val=input.value.trim(); if(!val) return;
+  const msgs=document.getElementById('messages');
+  const now=new Date(), t=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  msgs.innerHTML+=`<div class="msg msg-bot">${val}<div class="msg-time">${t}</div></div>`;
+  input.value=''; msgs.scrollTop=msgs.scrollHeight;
+}
+function showQR(){ document.getElementById('qr-overlay').style.display='flex'; }
+function saveConfig(){
+  const store=document.getElementById('cfg-store').value.trim();
+  if(store){ localStorage.setItem('shopify_store',store); document.getElementById('store-label').textContent='Boutique: '+store; }
+  toast('✅ Configuration sauvegardée !');
+}
+
+// ─── STATISTIQUES ────────────────────────────────────────
+async function loadStats() {
+  const [orders, stats] = await Promise.all([
+    fetch('/api/orders').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json())
+  ]);
+  const total = stats.totalOrders || 0;
+  const confirmed = stats.confirmed || 0;
+  const cancelled = stats.cancelled || 0;
+  const pending = Array.from(orders).filter(o=>['sent','pending','reminded'].includes(o.status)).length;
+
+  const pct = v => total > 0 ? Math.round(v/total*100) : 0;
+
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-confirmed').textContent = confirmed;
+  document.getElementById('st-confirmed-pct').textContent = pct(confirmed)+'% du total';
+  document.getElementById('st-cancelled').textContent = cancelled;
+  document.getElementById('st-cancelled-pct').textContent = pct(cancelled)+'% du total';
+  document.getElementById('st-pending').textContent = pending;
+  document.getElementById('st-pending-pct').textContent = pct(pending)+'% du total';
+
+  // Barre de répartition
+  document.getElementById('bar-confirmed').style.flex = confirmed;
+  document.getElementById('bar-cancelled').style.flex = cancelled;
+  document.getElementById('bar-pending').style.flex = pending;
+  document.getElementById('bar-empty').style.flex = Math.max(0, total - confirmed - cancelled - pending);
+
+  // Cercle taux de réponse
+  const rate = stats.responseRate || 0;
+  const circumference = 201;
+  document.getElementById('st-rate-circle').style.strokeDashoffset = circumference - (circumference * rate / 100);
+  document.getElementById('st-rate-text').textContent = rate+'%';
+  document.getElementById('st-rate-big').textContent = rate+'%';
+  document.getElementById('st-rate-detail').textContent = `${confirmed + cancelled} réponses sur ${stats.sent || 0} messages envoyés`;
+
+  // Liste commandes sans réponse
+  const noReply = orders.filter(o=>['sent','pending','reminded'].includes(o.status));
+  const list = document.getElementById('st-no-reply-list');
+  if(noReply.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">✅</div>Aucune commande en attente</div>';
+  } else {
+    list.innerHTML = noReply.map(o => {
+      const color = colorFor(o.customerName);
+      const wait = Math.round((Date.now() - new Date(o.createdAt)) / 60000);
+      const waitTxt = wait < 60 ? `${wait} min` : `${Math.floor(wait/60)}h${String(wait%60).padStart(2,'0')}`;
+      return `<div class="order-card" style="margin-bottom:8px">
+        <div class="avatar" style="background:${color}22;color:${color}">${initials(o.customerName)}</div>
+        <div class="order-info">
+          <div class="order-name">${o.customerName}</div>
+          <div class="order-detail">#${o.shopifyId} · ${o.phone || '—'}</div>
+        </div>
+        <div class="order-right">
+          <div class="order-amount">${o.total}</div>
+          <div style="font-size:11px;color:#ffab00;margin-top:4px">⏳ ${waitTxt} sans réponse</div>
+        </div>
+        <button class="action-btn" onclick="sendWA('${o.id}',this)">📤 Relancer</button>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ─── TEMPLATES ───────────────────────────────────────────
+let allTemplates = {};
+const TEMPLATE_LABELS = {
+  confirmation: { icon: '📩', label: 'Message de confirmation', desc: 'Envoyé dès qu\'une commande est reçue' },
+  reminder:     { icon: '⏰', label: 'Rappel automatique',      desc: 'Envoyé après 120 min sans réponse' },
+  confirmed:    { icon: '✅', label: 'Commande confirmée',       desc: 'Envoyé quand le client répond OUI' },
+  cancelled:    { icon: '❌', label: 'Commande annulée',         desc: 'Envoyé quand le client répond NON' },
+  unknown:      { icon: '❓', label: 'Réponse non comprise',     desc: 'Envoyé si le client répond autre chose' }
+};
+const TEMPLATE_VARS = {
+  confirmation: ['{name}', '{orderNumber}', '{shop}', '{items}', '{total}', '{address}'],
+  reminder:     ['{name}', '{orderNumber}'],
+  confirmed:    ['{name}', '{orderNumber}'],
+  cancelled:    ['{orderNumber}'],
+  unknown:      []
+};
+async function loadTemplateEditor() {
+  const lang = document.getElementById('template-lang').value;
+  const res = await fetch('/api/templates');
+  allTemplates = await res.json();
+  const container = document.getElementById('template-editor');
+  container.innerHTML = '';
+  for (const [key, info] of Object.entries(TEMPLATE_LABELS)) {
+    const value = allTemplates[lang]?.[key] || '';
+    const vars = TEMPLATE_VARS[key];
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px';
+    const varButtons = vars.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+      ${vars.map(v => `<span onclick="insertVar('${key}','${v}')" title="Cliquer pour insérer" style="cursor:pointer;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-family:monospace;transition:all 0.15s;user-select:none" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text)'">${v}</span>`).join('')}
+    </div>` : '';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-weight:600;font-size:14px">${info.icon} ${info.label}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:2px">${info.desc}</div>
+        </div>
+        ${varButtons}
+      </div>
+      <textarea id="tpl-${key}" rows="6"
+        style="width:100%;padding:12px;border:0.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.5;background:var(--surface2);color:var(--text);outline:none"
+        onkeydown="if(event.keyCode===9){event.preventDefault();const ta=this;const start=ta.selectionStart;ta.value=ta.value.slice(0,start)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=start+2;}"
+        placeholder="Message…">${value}</textarea>
+    `;
+    container.appendChild(card);
+  }
+}
+function insertVar(key, variable) {
+  const ta = document.getElementById(`tpl-${key}`);
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + variable.length;
+  ta.focus();
+}
+async function saveTemplates() {
+  const lang = document.getElementById('template-lang').value;
+  for (const key of Object.keys(TEMPLATE_LABELS)) {
+    const ta = document.getElementById(`tpl-${key}`);
+    if (ta) allTemplates[lang][key] = ta.value;
+  }
+  const res = await fetch('/api/templates', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(allTemplates)
+  });
+  if (res.ok) toast('✅ Templates sauvegardés !');
+  else toast('❌ Erreur de sauvegarde', false);
+}
+async function resetTemplates() {
+  if (!confirm('Remettre tous les messages par défaut ?')) return;
+  await fetch('/api/templates/reset', { method: 'POST' });
+  await loadTemplateEditor();
+  toast('↺ Templates remis par défaut');
+}
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('sec-'+name).classList.add('visible');
+  if (name === 'templates') loadTemplateEditor();
+}
+
+async function pollWA(){
+  try {
+    const s=await fetch('/api/whatsapp/status').then(r=>r.json());
+    console.log('WA Status:', s);
+    const badge=document.getElementById('wa-badge');
+    const badgeText=document.getElementById('wa-badge-text');
+    const overlay=document.getElementById('qr-overlay');
+    const qrContent=document.getElementById('qr-content');
+    if(s.status==='connected'){
+      badge.className='wa-badge connected';
+      badgeText.textContent=`Connecté · +${s.phone}`;
+      document.getElementById('sidebar-phone').textContent=`+${s.phone}`;
+      document.getElementById('sidebar-status').textContent='En ligne';
+      document.getElementById('cfg-wa-status').value='✅ Connecté';
+      document.getElementById('cfg-wa-phone').value=`+${s.phone}`;
+      overlay.style.display='none';
+    } else if(s.status==='qr'){
+      badge.className='wa-badge qr';
+      badgeText.textContent='Scanner le QR';
+      document.getElementById('sidebar-phone').textContent='Non connecté';
+      document.getElementById('sidebar-status').textContent='En attente du scan';
+      overlay.style.display='flex';
+      if(s.qr) qrContent.innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`;
+    } else {
+      badge.className='wa-badge disconnected';
+      badgeText.textContent='Déconnecté';
+      document.getElementById('sidebar-phone').textContent='Non connecté';
+      document.getElementById('sidebar-status').textContent='Hors ligne';
+    }
+  } catch {}
+}
+pollWA(); setInterval(pollWA,3000);
+loadData(); setInterval(loadData,10000);
+const saved=localStorage.getItem('shopify_store');
+if(saved){ document.getElementById('store-label').textContent='Boutique: '+saved; document.getElementById('cfg-store').value=saved; }
+</script>
+</body>
+</html>
