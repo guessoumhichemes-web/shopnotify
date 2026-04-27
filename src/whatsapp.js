@@ -7,6 +7,7 @@
 const {
   default: makeWASocket,
   useMultiFileAuthState,
+  usePairingCode,
   DisconnectReason,
   fetchLatestBaileysVersion,
 } = require('@whiskeysockets/baileys');
@@ -20,12 +21,30 @@ const { updateShopifyOrder, cancelShopifyOrder } = require('./shopify');
 
 let sock = null;
 let qrCodeData = null;
+let pairingCode = null;
 let isReady = false;
 let myNumber = null;
 let reconnectAttempts = 0;
 
 const DATA_DIR = process.env.DATA_DIR || '/data';
 const SESSION_DIR = path.join(DATA_DIR, '.wa_session_baileys');
+
+// Générer un code de pairing
+async function generatePairingCode(phoneNumber) {
+  try {
+    console.log(`📱 Génération du code de pairing pour ${phoneNumber}...`);
+    const code = await usePairingCode({
+      phoneNumber: phoneNumber.replace(/\D/g, ''),
+      version: (await fetchLatestBaileysVersion()).version,
+    });
+    pairingCode = code;
+    console.log(`✅ Code de pairing: ${code}`);
+    return code;
+  } catch (err) {
+    console.error('❌ Erreur génération code:', err.message);
+    throw err;
+  }
+}
 
 async function initWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
@@ -254,8 +273,9 @@ function getStatus() {
   return {
     connected: isReady,
     qr: qrCodeData,
+    pairingCode: pairingCode,
     phone: myNumber,
-    status: isReady ? 'connected' : qrCodeData ? 'qr' : 'disconnected'
+    status: isReady ? 'connected' : pairingCode ? 'pairing' : qrCodeData ? 'qr' : 'disconnected'
   };
 }
 
@@ -270,6 +290,7 @@ async function sendManualMessage(phone, message) {
 
 module.exports = {
   initWhatsApp,
+  generatePairingCode,
   getStatus,
   sendConfirmation,
   sendManualMessage

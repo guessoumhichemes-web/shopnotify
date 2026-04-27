@@ -253,13 +253,44 @@ body {
 <!-- QR Overlay -->
 <div class="qr-overlay" id="qr-overlay" style="display:none;">
   <div class="qr-modal">
-    <h2>📱 Connecter WhatsApp</h2>
-    <p>Scanne ce QR code depuis WhatsApp sur ton téléphone pour activer les notifications automatiques.</p>
+    <h2 id="qr-title">📱 Connecter WhatsApp</h2>
+    <p id="qr-desc">Choisis ta méthode de connexion préférée.</p>
     <div id="qr-content">
-      <div class="spinner"></div>
-      <p style="color:var(--muted);font-size:12px;">Génération du QR code...</p>
+      <!-- Sélection de méthode -->
+      <div id="method-selector" style="display:flex;gap:12px;margin-bottom:20px;flex-direction:column">
+        <button onclick="showPairingForm()" style="padding:12px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:10px;cursor:pointer;font-weight:600;transition:all 0.15s" onmouseover="this.style.background='rgba(37,211,102,0.22)'" onmouseout="this.style.background='var(--green-dim)'">✅ Code de pairing (recommandé)</button>
+        <button onclick="showQRMethod()" style="padding:12px;border:0.5px solid var(--border);background:transparent;color:var(--text);border-radius:10px;cursor:pointer;font-weight:600;transition:all 0.15s" onmouseover="this.style.borderColor='var(--muted)'" onmouseout="this.style.borderColor='var(--border)'">📸 QR Code</button>
+      </div>
+      <!-- Formulaire pairing code -->
+      <div id="pairing-form" style="display:none;flex-direction:column;gap:12px">
+        <div style="font-size:12px;color:var(--muted)">Rentre ton numéro WhatsApp pour générer le code de pairing (ex: 34612345678)</div>
+        <input id="phone-input" type="text" placeholder="Numéro WhatsApp (sans +)" style="width:100%;padding:10px 12px;border:0.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-family:monospace;outline:none;font-size:13px" onkeydown="if(event.key==='Enter')genPairingCode()" />
+        <button onclick="genPairingCode()" style="padding:10px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.15s;font-size:13px" id="pairing-btn">Générer le code</button>
+        <button onclick="backToSelector()" style="padding:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Retour</button>
+      </div>
+      <!-- Résultat pairing code -->
+      <div id="pairing-result" style="display:none;flex-direction:column;gap:14px">
+        <div style="background:var(--green-dim);border:0.5px solid var(--green-border);border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Ton code de pairing est :</div>
+          <div id="pairing-code" style="font-size:32px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green);letter-spacing:4px">——————</div>
+        </div>
+        <div style="background:rgba(255,171,0,0.1);border:0.5px solid rgba(255,171,0,0.3);border-radius:10px;padding:12px;font-size:12px;line-height:1.6;color:var(--muted)">
+          <strong style="color:#ffab00">⚠️ Instructions :</strong><br>
+          1️⃣ Ouvre WhatsApp sur ton téléphone<br>
+          2️⃣ Va dans <strong>Paramètres → Appareils liés</strong><br>
+          3️⃣ Appuie sur <strong>"Lier avec numéro de téléphone"</strong><br>
+          4️⃣ Entre ce code : <strong id="code-copy">——————</strong><br>
+          5️⃣ Attends la confirmation
+        </div>
+        <button onclick="backToSelector()" style="padding:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Essayer une autre méthode</button>
+      </div>
+      <!-- QR code -->
+      <div id="qr-method" style="display:none;flex-direction:column;gap:12px">
+        <div class="qr-img-wrap"><img src="" alt="QR" id="qr-img" /></div>
+        <button onclick="backToSelector()" style="padding:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Essayer une autre méthode</button>
+      </div>
     </div>
-    <div class="qr-steps">
+    <div class="qr-steps" id="qr-steps">
       <div class="qr-step"><div class="qr-num">1</div>Ouvre WhatsApp sur ton téléphone</div>
       <div class="qr-step"><div class="qr-num">2</div>Appuie sur ⋮ → "Appareils liés"</div>
       <div class="qr-step"><div class="qr-num">3</div>Sélectionne "Lier un appareil"</div>
@@ -775,6 +806,65 @@ function showSection(name) {
   if (name === 'templates') loadTemplateEditor();
 }
 
+function showPairingForm(){
+  document.getElementById('method-selector').style.display='none';
+  document.getElementById('qr-steps').style.display='none';
+  document.getElementById('pairing-form').style.display='flex';
+  document.getElementById('qr-method').style.display='none';
+  document.getElementById('pairing-result').style.display='none';
+  document.getElementById('qr-title').textContent='📱 Code de pairing';
+  document.getElementById('qr-desc').textContent='Génère un code unique pour lier WhatsApp.';
+  document.getElementById('phone-input').focus();
+}
+function showQRMethod(){
+  document.getElementById('method-selector').style.display='none';
+  document.getElementById('qr-steps').style.display='block';
+  document.getElementById('qr-method').style.display='flex';
+  document.getElementById('pairing-form').style.display='none';
+  document.getElementById('pairing-result').style.display='none';
+  document.getElementById('qr-title').textContent='📱 Scanne le QR Code';
+  document.getElementById('qr-desc').textContent='Utilise WhatsApp sur ton téléphone pour scanner.';
+}
+function backToSelector(){
+  document.getElementById('method-selector').style.display='flex';
+  document.getElementById('qr-steps').style.display='none';
+  document.getElementById('pairing-form').style.display='none';
+  document.getElementById('pairing-result').style.display='none';
+  document.getElementById('qr-method').style.display='none';
+  document.getElementById('qr-title').textContent='📱 Connecter WhatsApp';
+  document.getElementById('qr-desc').textContent='Choisis ta méthode de connexion préférée.';
+}
+async function genPairingCode(){
+  const phone=document.getElementById('phone-input').value.trim();
+  if(!phone||phone.length<8){
+    alert('Rentre un numéro valide (min 8 chiffres)');
+    return;
+  }
+  const btn=document.getElementById('pairing-btn');
+  btn.disabled=true;
+  btn.textContent='⏳ Génération...';
+  try {
+    const r=await fetch('/api/whatsapp/pairing-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phoneNumber:phone})});
+    const d=await r.json();
+    if(d.success){
+      const code=d.code;
+      document.getElementById('pairing-code').textContent=code;
+      document.getElementById('code-copy').textContent=code;
+      document.getElementById('pairing-form').style.display='none';
+      document.getElementById('pairing-result').style.display='flex';
+      document.getElementById('qr-title').textContent='✅ Code généré !';
+      document.getElementById('qr-desc').textContent=d.instructions;
+    } else {
+      alert('❌ Erreur: '+d.error);
+      btn.disabled=false;
+      btn.textContent='Générer le code';
+    }
+  } catch(e){
+    alert('❌ Erreur réseau: '+e.message);
+    btn.disabled=false;
+    btn.textContent='Générer le code';
+  }
+}
 async function pollWA(){
   try {
     const s=await fetch('/api/whatsapp/status').then(r=>r.json());
@@ -782,7 +872,6 @@ async function pollWA(){
     const badge=document.getElementById('wa-badge');
     const badgeText=document.getElementById('wa-badge-text');
     const overlay=document.getElementById('qr-overlay');
-    const qrContent=document.getElementById('qr-content');
     if(s.status==='connected'){
       badge.className='wa-badge connected';
       badgeText.textContent=`Connecté · +${s.phone}`;
@@ -791,18 +880,29 @@ async function pollWA(){
       document.getElementById('cfg-wa-status').value='✅ Connecté';
       document.getElementById('cfg-wa-phone').value=`+${s.phone}`;
       overlay.style.display='none';
+    } else if(s.status==='pairing'){
+      badge.className='wa-badge qr';
+      badgeText.textContent='Pairing en cours...';
+      document.getElementById('sidebar-phone').textContent='Non connecté';
+      document.getElementById('sidebar-status').textContent='En attente du code';
+      document.getElementById('cfg-wa-status').value='⏳ Pairing en cours...';
     } else if(s.status==='qr'){
       badge.className='wa-badge qr';
       badgeText.textContent='Scanner le QR';
       document.getElementById('sidebar-phone').textContent='Non connecté';
       document.getElementById('sidebar-status').textContent='En attente du scan';
       overlay.style.display='flex';
-      if(s.qr) qrContent.innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`;
+      if(s.qr){
+        const qrImg=document.getElementById('qr-img');
+        qrImg.src=s.qr;
+        document.getElementById('qr-method').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div><button onclick="backToSelector()" style="padding:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Essayer une autre méthode</button>`;
+      }
     } else {
       badge.className='wa-badge disconnected';
       badgeText.textContent='Déconnecté';
       document.getElementById('sidebar-phone').textContent='Non connecté';
       document.getElementById('sidebar-status').textContent='Hors ligne';
+      document.getElementById('cfg-wa-status').value='❌ Déconnecté';
     }
   } catch {}
 }
