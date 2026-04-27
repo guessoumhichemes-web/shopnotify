@@ -4,10 +4,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { initDb } = require('./db');
-const { initWhatsApp, getStatus, sendConfirmation, sendManualMessage } = require('./whatsapp');
+const { initWhatsApp, requestPairingCode, getStatus, sendConfirmation, sendManualMessage, startQR, startPairing, disconnectWhatsApp, setBotActive, getBotActive } = require('./whatsapp');
 const { handleShopifyWebhook } = require('./shopify');
 const { getPendingOrders, getStats } = require('./store');
-const { loadTemplates, saveTemplates, DEFAULT_TEMPLATES } = require('./templates');
+const { loadTemplates, saveTemplates, DEFAULT_TEMPLATES, loadSequence, saveSequence } = require('./templates');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +23,51 @@ app.get('/', (req, res) => {
 
 app.get('/api/whatsapp/status', (req, res) => {
   res.json(getStatus());
+});
+
+app.post('/api/whatsapp/start/qr', async (req, res) => {
+  try {
+    await startQR();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/whatsapp/start/pairing', async (req, res) => {
+  const { phoneNumber } = req.body;
+  if (!phoneNumber) return res.status(400).json({ success: false, error: 'phoneNumber requis' });
+  try {
+    await startPairing(phoneNumber);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/whatsapp/disconnect', async (req, res) => {
+  try {
+    await disconnectWhatsApp();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/whatsapp/toggle', (req, res) => {
+  setBotActive(!getBotActive());
+  res.json({ success: true, active: getBotActive() });
+});
+
+app.post('/api/whatsapp/pairing-code', async (req, res) => {
+  const { phoneNumber } = req.body;
+  if (!phoneNumber) return res.status(400).json({ success: false, error: 'phoneNumber requis' });
+  try {
+    const code = await requestPairingCode(phoneNumber);
+    res.json({ success: true, code });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post('/webhook/orders/create', handleShopifyWebhook);
@@ -80,25 +125,31 @@ app.post('/api/templates/reset', (req, res) => {
   res.json({ success: true });
 });
 
+app.get('/api/sequence', (req, res) => {
+  res.json(loadSequence());
+});
+
+app.put('/api/sequence', (req, res) => {
+  try {
+    saveSequence(req.body);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`\n🚀 ShopNotify démarré sur http://localhost:${PORT}`);
   console.log(`📱 Ouvre le dashboard pour scanner le QR WhatsApp\n`);
 });
 
-// ⭐ Initialisation DB SQLite + WhatsApp
+// ⭐ Initialisation DB SQLite
 (async () => {
   try {
     await initDb();
     console.log('✅ Database initialisée');
   } catch (err) {
     console.error('❌ Erreur initialisation Database:', err);
-    process.exit(1);
-  }
-
-  try {
-    await initWhatsApp();
-  } catch (err) {
-    console.error('❌ Erreur initialisation WhatsApp:', err);
     process.exit(1);
   }
 })();

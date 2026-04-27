@@ -253,17 +253,60 @@ body {
 <!-- QR Overlay -->
 <div class="qr-overlay" id="qr-overlay" style="display:none;">
   <div class="qr-modal">
-    <h2>📱 Connecter WhatsApp</h2>
-    <p>Scanne ce QR code depuis WhatsApp sur ton téléphone pour activer les notifications automatiques.</p>
-    <div id="qr-content">
-      <div class="spinner"></div>
-      <p style="color:var(--muted);font-size:12px;">Génération du QR code...</p>
+    <h2 id="modal-title">📱 Connecter WhatsApp</h2>
+    <p id="modal-desc">Choisis ta méthode de connexion.</p>
+
+    <!-- Vue: Choix de méthode -->
+    <div id="view-choice" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <button onclick="startQRMode()" style="padding:12px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">📸 QR Code</button>
+      <button onclick="showView('pairing-form')" style="padding:12px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit">📱 Numéro de téléphone</button>
     </div>
-    <div class="qr-steps">
-      <div class="qr-step"><div class="qr-num">1</div>Ouvre WhatsApp sur ton téléphone</div>
-      <div class="qr-step"><div class="qr-num">2</div>Appuie sur ⋮ → "Appareils liés"</div>
-      <div class="qr-step"><div class="qr-num">3</div>Sélectionne "Lier un appareil"</div>
-      <div class="qr-step"><div class="qr-num">4</div>Scanne le QR ci-dessus</div>
+
+    <!-- Vue: QR code -->
+    <div id="view-qr" style="display:none">
+      <div id="qr-content" style="text-align:center;margin-bottom:14px">
+        <div class="spinner"></div>
+        <p style="color:var(--muted);font-size:12px;">Génération du QR code...</p>
+      </div>
+      <div class="qr-steps">
+        <div class="qr-step"><div class="qr-num">1</div>Ouvre WhatsApp sur ton téléphone</div>
+        <div class="qr-step"><div class="qr-num">2</div>Appuie sur ⋮ → "Appareils liés"</div>
+        <div class="qr-step"><div class="qr-num">3</div>Sélectionne "Lier un appareil"</div>
+        <div class="qr-step"><div class="qr-num">4</div>Scanne le QR ci-dessus</div>
+      </div>
+      <button onclick="disconnectAndBack()" style="width:100%;margin-top:14px;padding:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">← Essayer autrement</button>
+    </div>
+
+    <!-- Vue: Formulaire pairing -->
+    <div id="view-pairing-form" style="display:none">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Entre ton numéro WhatsApp avec indicatif pays (ex: 34612345678)</div>
+      <input id="pairing-phone" type="tel" placeholder="34612345678" style="width:100%;padding:10px 12px;border:0.5px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-family:'Space Mono',monospace;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box" onkeydown="if(event.key==='Enter')startPairingMode()" />
+      <button id="btn-gencode" onclick="startPairingMode()" style="width:100%;padding:11px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;margin-bottom:8px">Générer</button>
+      <button onclick="disconnectAndBack()" style="width:100%;padding:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">← Essayer autrement</button>
+      <!-- Résultat code -->
+      <div id="pairing-result" style="display:none;margin-top:14px">
+        <div style="background:var(--green-dim);border:0.5px solid var(--green-border);border-radius:10px;padding:16px;text-align:center;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Ton code :</div>
+          <div id="pairing-code-display" style="font-size:34px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green);letter-spacing:6px"></div>
+        </div>
+        <div style="background:rgba(255,171,0,0.08);border:0.5px solid rgba(255,171,0,0.3);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;color:var(--muted)">
+          1️⃣ Ouvre WhatsApp → <strong>Paramètres</strong><br>
+          2️⃣ → <strong>Appareils liés</strong><br>
+          3️⃣ → <strong>"Lier avec numéro de téléphone"</strong><br>
+          4️⃣ Entre le code ci-dessus
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue: Connecté -->
+    <div id="view-connected" style="display:none">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="font-size:28px;margin-bottom:10px">🟢</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Connecté avec succès !</div>
+        <div style="font-size:12px;color:var(--muted);">+<span id="connected-phone">—</span></div>
+      </div>
+      <button id="btn-toggle-bot" onclick="toggleBot()" style="width:100%;padding:11px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;margin-bottom:8px">✓ Actif</button>
+      <button onclick="disconnectWA()" style="width:100%;padding:8px;border:0.5px solid var(--border);background:transparent;color:#ff6b6b;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">🔴 Déconnecter</button>
     </div>
   </div>
 </div>
@@ -466,18 +509,32 @@ body {
     <!-- TEMPLATES -->
     <div class="section" id="sec-templates">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div class="sec-title" style="margin:0">📝 Messages automatiques</div>
+        <div class="sec-title" style="margin:0">📝 Séquence de messages</div>
         <div style="display:flex;gap:10px">
-          <select id="template-lang" onchange="loadTemplateEditor()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;outline:none">
+          <select id="sequence-lang" onchange="loadSequenceEditor()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;outline:none">
             <option value="es">🇪🇸 Español</option>
             <option value="fr">🇫🇷 Français</option>
           </select>
-          <button onclick="resetTemplates()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.15s">↺ Défauts</button>
-          <button onclick="saveTemplates()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s">💾 Sauvegarder</button>
+          <button onclick="saveSequence()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s">💾 Sauvegarder</button>
         </div>
       </div>
 
-      <div id="template-editor" style="display:flex;flex-direction:column;gap:16px"></div>
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">
+        <div id="sequence-editor" style="display:flex;flex-direction:column;gap:10px"></div>
+        <button onclick="addSequenceStep()" style="margin-top:16px;padding:10px 20px;border-radius:8px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;width:100%;">+ Ajouter une étape</button>
+      </div>
+
+      <!-- Messages de réponse (OUI/NON/inconnu) -->
+      <div class="sec-title">Messages de réponse</div>
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <select id="response-lang" onchange="loadResponseEditor()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;outline:none">
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+        </select>
+        <button onclick="resetTemplates()" style="padding:8px 12px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.15s">↺ Défauts</button>
+      </div>
+
+      <div id="response-editor" style="display:flex;flex-direction:column;gap:16px"></div>
     </div>
 
     <!-- CONFIG -->
@@ -627,7 +684,75 @@ function sendMsg(){
   msgs.innerHTML+=`<div class="msg msg-bot">${val}<div class="msg-time">${t}</div></div>`;
   input.value=''; msgs.scrollTop=msgs.scrollHeight;
 }
-function showQR(){ document.getElementById('qr-overlay').style.display='flex'; }
+function showQR(){ document.getElementById('qr-overlay').style.display='flex'; showView('choice'); }
+function showView(v){
+  ['choice','pairing-form','qr','connected'].forEach(id=>{const el=document.getElementById('view-'+id); if(el) el.style.display='none';});
+  const el=document.getElementById('view-'+v);
+  if(el){ el.style.display='block'; el.style.flexDirection='column'; }
+  if(v==='choice'){ document.getElementById('modal-title').textContent='📱 Connecter WhatsApp'; document.getElementById('modal-desc').textContent='Choisis ta méthode de connexion.'; }
+  if(v==='pairing-form'){ document.getElementById('modal-title').textContent='📱 Code de pairing'; document.getElementById('modal-desc').textContent='Entre ton numéro pour recevoir un code.'; setTimeout(()=>document.getElementById('pairing-phone').focus(),100); }
+  if(v==='qr'){ document.getElementById('modal-title').textContent='📸 Scanner le QR Code'; document.getElementById('modal-desc').textContent='Utilise WhatsApp sur ton téléphone.'; }
+  if(v==='connected'){ document.getElementById('modal-title').textContent='🟢 WhatsApp Connecté'; document.getElementById('modal-desc').textContent=''; }
+}
+async function startQRMode(){
+  const btn=event.target;
+  btn.disabled=true; btn.textContent='⏳ Lancement...';
+  try{
+    await fetch('/api/whatsapp/start/qr',{method:'POST'});
+    showView('qr');
+    pollQRCode();
+  }catch(e){ alert('❌ Erreur: '+e.message); btn.disabled=false; btn.textContent='📸 QR Code'; }
+}
+async function startPairingMode(){
+  const phone=document.getElementById('pairing-phone').value.replace(/\D/g,'');
+  if(!phone||phone.length<8){ alert('Numéro invalide'); return; }
+  const btn=document.getElementById('btn-gencode');
+  btn.disabled=true; btn.textContent='⏳ Génération...';
+  try{
+    await fetch('/api/whatsapp/start/pairing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phoneNumber:phone})});
+    pollPairingCode();
+    btn.textContent='✅ Code généré !';
+  }catch(e){ alert('❌ Erreur: '+e.message); btn.disabled=false; btn.textContent='Générer'; }
+}
+async function pollQRCode(){
+  for(let i=0;i<60;i++){
+    await new Promise(r=>setTimeout(r,500));
+    const s=await fetch('/api/whatsapp/status').then(r=>r.json()).catch(()=>({}));
+    if(s.qr){ document.getElementById('qr-content').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`; }
+    if(s.status==='connected'){ updateConnectedView(s); return; }
+  }
+}
+async function pollPairingCode(){
+  const btn=document.getElementById('btn-gencode');
+  for(let i=0;i<120;i++){
+    await new Promise(r=>setTimeout(r,500));
+    const s=await fetch('/api/whatsapp/status').then(r=>r.json()).catch(()=>({}));
+    if(s.pairingCode){ document.getElementById('pairing-code-display').textContent=s.pairingCode; document.getElementById('pairing-result').style.display='block'; }
+    if(s.status==='connected'){ updateConnectedView(s); return; }
+  }
+  btn.disabled=false; btn.textContent='Générer';
+}
+function updateConnectedView(status){
+  if(status.phone){ document.getElementById('connected-phone').textContent=status.phone; }
+  showView('connected');
+}
+async function disconnectWA(){
+  if(!confirm('Êtes-vous sûr de vouloir déconnecter WhatsApp ?')) return;
+  await fetch('/api/whatsapp/disconnect',{method:'POST'});
+  showView('choice');
+}
+async function disconnectAndBack(){
+  await fetch('/api/whatsapp/disconnect',{method:'POST'});
+  showView('choice');
+}
+async function toggleBot(){
+  const btn=document.getElementById('btn-toggle-bot');
+  const r=await fetch('/api/whatsapp/toggle',{method:'POST'}).then(r=>r.json());
+  btn.textContent=r.active?'✓ Actif':'⏸ Désactivé';
+  btn.style.backgroundColor=r.active?'var(--green-dim)':'rgba(255,107,107,0.1)';
+  btn.style.borderColor=r.active?'var(--green-border)':'rgba(255,107,107,0.3)';
+  btn.style.color=r.active?'var(--green)':'#ff6b6b';
+}
 function saveConfig(){
   const store=document.getElementById('cfg-store').value.trim();
   if(store){ localStorage.setItem('shopify_store',store); document.getElementById('store-label').textContent='Boutique: '+store; }
@@ -695,35 +820,129 @@ async function loadStats() {
   }
 }
 
-// ─── TEMPLATES ───────────────────────────────────────────
+// ─── SÉQUENCE ───────────────────────────────────────────
+let allSequence = [];
+async function loadSequenceEditor() {
+  const lang = document.getElementById('sequence-lang').value;
+  const res = await fetch('/api/sequence');
+  allSequence = await res.json();
+  const container = document.getElementById('sequence-editor');
+  container.innerHTML = '';
+
+  allSequence.forEach((step, idx) => {
+    const stepText = step.template && step.template[lang] ? step.template[lang] : 'Message non disponible';
+    const card = document.createElement('div');
+    card.draggable = true;
+    card.style.cssText = 'background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:12px;cursor:move;transition:all 0.15s';
+    card.onmouseover = () => card.style.borderColor = 'var(--green-border)';
+    card.onmouseout = () => card.style.borderColor = 'var(--border)';
+    card.ondragstart = (e) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('index', idx); };
+    card.ondragover = (e) => { e.preventDefault(); card.style.background = 'rgba(37,211,102,0.08)'; };
+    card.ondragleave = () => { card.style.background = 'var(--surface2)'; };
+    card.ondrop = (e) => {
+      e.preventDefault();
+      const fromIdx = parseInt(e.dataTransfer.getData('index'));
+      if (fromIdx !== idx) {
+        const temp = allSequence[fromIdx];
+        allSequence[fromIdx] = allSequence[idx];
+        allSequence[idx] = temp;
+        loadSequenceEditor();
+      }
+      card.style.background = 'var(--surface2)';
+    };
+
+    const delayInput = document.createElement('input');
+    delayInput.type = 'number';
+    delayInput.value = step.delayHours || 0;
+    delayInput.style.cssText = 'width:50px;padding:4px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-size:11px';
+    delayInput.onchange = () => { allSequence[idx].delayHours = parseInt(delayInput.value); };
+
+    const textarea = document.createElement('textarea');
+    textarea.value = stepText;
+    textarea.rows = 3;
+    textarea.style.cssText = 'width:100%;padding:8px;border:0.5px solid var(--border);border-radius:4px;font-size:11px;background:var(--surface);color:var(--text);resize:vertical;box-sizing:border-box;margin-top:8px;margin-bottom:8px';
+    textarea.onchange = () => {
+      if (!allSequence[idx].template) allSequence[idx].template = {};
+      allSequence[idx].template[lang] = textarea.value;
+    };
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Supprimer';
+    deleteBtn.style.cssText = 'padding:4px 12px;border:0.5px solid rgba(255,107,107,0.3);background:transparent;color:#ff6b6b;border-radius:4px;font-size:11px;cursor:pointer;transition:all 0.15s';
+    deleteBtn.onclick = () => { allSequence.splice(idx, 1); loadSequenceEditor(); };
+
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:600;font-size:12px">${step.label}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label style="font-size:11px;color:var(--muted)">Délai (h):</label>
+        </div>
+      </div>
+    `;
+    card.appendChild(delayInput);
+    card.appendChild(textarea);
+    card.appendChild(deleteBtn);
+
+    if (idx < allSequence.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.textContent = '↓';
+      arrow.style.cssText = 'text-align:center;color:var(--muted);font-size:16px;padding:4px';
+      container.appendChild(card);
+      container.appendChild(arrow);
+    } else {
+      container.appendChild(card);
+    }
+  });
+}
+
+async function addSequenceStep() {
+  allSequence.push({
+    id: 'step_' + Date.now(),
+    label: 'Nouvelle étape',
+    delayHours: 0,
+    template: { fr: '', es: '' }
+  });
+  const lang = document.getElementById('sequence-lang').value;
+  loadSequenceEditor();
+}
+
+async function saveSequence() {
+  const res = await fetch('/api/sequence', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(allSequence)
+  });
+  if (res.ok) toast('✅ Séquence sauvegardée !');
+  else toast('❌ Erreur de sauvegarde', false);
+}
+
+// ─── TEMPLATES (RÉPONSES) ───────────────────────────────────────────
 let allTemplates = {};
-const TEMPLATE_LABELS = {
-  confirmation: { icon: '📩', label: 'Message de confirmation', desc: 'Envoyé dès qu\'une commande est reçue' },
-  reminder:     { icon: '⏰', label: 'Rappel automatique',      desc: 'Envoyé après 120 min sans réponse' },
+const RESPONSE_LABELS = {
   confirmed:    { icon: '✅', label: 'Commande confirmée',       desc: 'Envoyé quand le client répond OUI' },
   cancelled:    { icon: '❌', label: 'Commande annulée',         desc: 'Envoyé quand le client répond NON' },
   unknown:      { icon: '❓', label: 'Réponse non comprise',     desc: 'Envoyé si le client répond autre chose' }
 };
-const TEMPLATE_VARS = {
-  confirmation: ['{name}', '{orderNumber}', '{shop}', '{items}', '{total}', '{address}'],
-  reminder:     ['{name}', '{orderNumber}'],
+const RESPONSE_VARS = {
   confirmed:    ['{name}', '{orderNumber}'],
   cancelled:    ['{orderNumber}'],
   unknown:      []
 };
-async function loadTemplateEditor() {
-  const lang = document.getElementById('template-lang').value;
+
+async function loadResponseEditor() {
+  const lang = document.getElementById('response-lang').value;
   const res = await fetch('/api/templates');
   allTemplates = await res.json();
-  const container = document.getElementById('template-editor');
+  const container = document.getElementById('response-editor');
   container.innerHTML = '';
-  for (const [key, info] of Object.entries(TEMPLATE_LABELS)) {
+
+  for (const [key, info] of Object.entries(RESPONSE_LABELS)) {
     const value = allTemplates[lang]?.[key] || '';
-    const vars = TEMPLATE_VARS[key];
+    const vars = RESPONSE_VARS[key];
     const card = document.createElement('div');
     card.style.cssText = 'background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px';
     const varButtons = vars.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-      ${vars.map(v => `<span onclick="insertVar('${key}','${v}')" title="Cliquer pour insérer" style="cursor:pointer;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-family:monospace;transition:all 0.15s;user-select:none" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text)'">${v}</span>`).join('')}
+      ${vars.map(v => `<span onclick="insertResponseVar('${key}','${v}')" title="Cliquer pour insérer" style="cursor:pointer;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-family:monospace;transition:all 0.15s;user-select:none" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text)'">${v}</span>`).join('')}
     </div>` : '';
     card.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
@@ -733,7 +952,7 @@ async function loadTemplateEditor() {
         </div>
         ${varButtons}
       </div>
-      <textarea id="tpl-${key}" rows="6"
+      <textarea id="resp-${key}" rows="4"
         style="width:100%;padding:12px;border:0.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.5;background:var(--surface2);color:var(--text);outline:none"
         onkeydown="if(event.keyCode===9){event.preventDefault();const ta=this;const start=ta.selectionStart;ta.value=ta.value.slice(0,start)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=start+2;}"
         placeholder="Message…">${value}</textarea>
@@ -741,18 +960,20 @@ async function loadTemplateEditor() {
     container.appendChild(card);
   }
 }
-function insertVar(key, variable) {
-  const ta = document.getElementById(`tpl-${key}`);
+
+function insertResponseVar(key, variable) {
+  const ta = document.getElementById(`resp-${key}`);
   const start = ta.selectionStart;
   const end = ta.selectionEnd;
   ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end);
   ta.selectionStart = ta.selectionEnd = start + variable.length;
   ta.focus();
 }
+
 async function saveTemplates() {
-  const lang = document.getElementById('template-lang').value;
-  for (const key of Object.keys(TEMPLATE_LABELS)) {
-    const ta = document.getElementById(`tpl-${key}`);
+  const lang = document.getElementById('response-lang').value;
+  for (const key of Object.keys(RESPONSE_LABELS)) {
+    const ta = document.getElementById(`resp-${key}`);
     if (ta) allTemplates[lang][key] = ta.value;
   }
   const res = await fetch('/api/templates', {
@@ -763,16 +984,21 @@ async function saveTemplates() {
   if (res.ok) toast('✅ Templates sauvegardés !');
   else toast('❌ Erreur de sauvegarde', false);
 }
+
 async function resetTemplates() {
   if (!confirm('Remettre tous les messages par défaut ?')) return;
   await fetch('/api/templates/reset', { method: 'POST' });
-  await loadTemplateEditor();
+  await loadResponseEditor();
   toast('↺ Templates remis par défaut');
 }
+
 function showSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
   document.getElementById('sec-'+name).classList.add('visible');
-  if (name === 'templates') loadTemplateEditor();
+  if (name === 'templates') {
+    loadSequenceEditor();
+    loadResponseEditor();
+  }
 }
 
 async function pollWA(){
@@ -782,31 +1008,38 @@ async function pollWA(){
     const badge=document.getElementById('wa-badge');
     const badgeText=document.getElementById('wa-badge-text');
     const overlay=document.getElementById('qr-overlay');
+    const isActive=s.active!==false;
     if(s.status==='connected'){
       badge.className='wa-badge connected';
-      badgeText.textContent=`Connecté · +${s.phone}`;
+      badgeText.innerHTML=`<span class="dot">${isActive?'🟢':'🟡'}</span><span>Connecté · +${s.phone}</span>`;
       document.getElementById('sidebar-phone').textContent=`+${s.phone}`;
-      document.getElementById('sidebar-status').textContent='En ligne';
+      document.getElementById('sidebar-status').textContent=isActive?'En ligne':'Désactivé';
       document.getElementById('cfg-wa-status').value='✅ Connecté';
       document.getElementById('cfg-wa-phone').value=`+${s.phone}`;
-      overlay.style.display='none';
+      if(overlay.style.display==='flex' && document.getElementById('view-connected').style.display==='block'){
+        updateConnectedView(s);
+      } else {
+        overlay.style.display='none';
+      }
     } else if(s.status==='qr'){
       badge.className='wa-badge qr';
       badgeText.textContent='Scanner le QR';
       document.getElementById('sidebar-phone').textContent='Non connecté';
       document.getElementById('sidebar-status').textContent='En attente du scan';
       overlay.style.display='flex';
+      showView('qr');
       if(s.qr){
-        const qrImg=document.getElementById('qr-img');
-        qrImg.src=s.qr;
-        document.getElementById('qr-method').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div><button onclick="backToSelector()" style="padding:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Essayer une autre méthode</button>`;
+        document.getElementById('qr-content').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`;
       }
     } else {
       badge.className='wa-badge disconnected';
-      badgeText.textContent='Déconnecté';
+      badgeText.textContent='🔴 Déconnecté';
       document.getElementById('sidebar-phone').textContent='Non connecté';
       document.getElementById('sidebar-status').textContent='Hors ligne';
       document.getElementById('cfg-wa-status').value='❌ Déconnecté';
+      document.getElementById('cfg-wa-phone').value='—';
+      overlay.style.display='flex';
+      showView('choice');
     }
   } catch {}
 }

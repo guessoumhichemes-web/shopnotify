@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const TEMPLATES_FILE = path.join(__dirname, '../templates.json');
+const SEQUENCE_FILE = path.join(__dirname, '../data/sequence.json');
+const DATA_DIR = process.env.DATA_DIR || '/data';
+const SEQUENCE_FILE_ENV = path.join(DATA_DIR, 'sequence.json');
 
 const DEFAULT_TEMPLATES = {
   fr: {
@@ -125,10 +128,55 @@ function getMessage(type, lang, vars) {
   return renderTemplate(template, vars);
 }
 
+// Séquence de messages par défaut
+const DEFAULT_SEQUENCE = [
+  {
+    id: 'confirmation',
+    label: 'Message de confirmation',
+    delayHours: 0,
+    template: DEFAULT_TEMPLATES
+  },
+  {
+    id: 'reminder',
+    label: 'Relance automatique',
+    delayHours: 2,
+    template: {
+      fr: DEFAULT_TEMPLATES.fr.reminder,
+      es: DEFAULT_TEMPLATES.es.reminder
+    }
+  }
+];
+
+// Charge la séquence de messages
+function loadSequence() {
+  try {
+    const sequencePath = SEQUENCE_FILE_ENV;
+    if (fs.existsSync(sequencePath)) {
+      const raw = fs.readFileSync(sequencePath, 'utf8');
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error('Erreur chargement séquence:', e.message);
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_SEQUENCE));
+}
+
+// Sauvegarde la séquence
+function saveSequence(sequence) {
+  const dir = path.dirname(SEQUENCE_FILE_ENV);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(SEQUENCE_FILE_ENV, JSON.stringify(sequence, null, 2), 'utf8');
+}
+
 module.exports = {
   loadTemplates,
   saveTemplates,
   detectLanguage,
   getMessage,
-  DEFAULT_TEMPLATES
+  DEFAULT_TEMPLATES,
+  loadSequence,
+  saveSequence,
+  DEFAULT_SEQUENCE
 };
