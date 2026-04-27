@@ -4,7 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { initDb } = require('./db');
-const { initWhatsApp, generatePairingCode, getStatus, sendConfirmation, sendManualMessage } = require('./whatsapp');
+const { initWhatsApp, getStatus, sendConfirmation, sendManualMessage } = require('./whatsapp');
 const { handleShopifyWebhook } = require('./shopify');
 const { getPendingOrders, getStats } = require('./store');
 const { loadTemplates, saveTemplates, DEFAULT_TEMPLATES } = require('./templates');
@@ -23,19 +23,6 @@ app.get('/', (req, res) => {
 
 app.get('/api/whatsapp/status', (req, res) => {
   res.json(getStatus());
-});
-
-app.post('/api/whatsapp/pairing-code', async (req, res) => {
-  const { phoneNumber } = req.body;
-  if (!phoneNumber) {
-    return res.status(400).json({ success: false, error: 'phoneNumber requis' });
-  }
-  try {
-    const code = await generatePairingCode(phoneNumber);
-    res.json({ success: true, code, instructions: 'Allez dans WhatsApp > Paramètres > Appareils liés > Lier avec numéro de téléphone, puis entrez ce code' });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
 });
 
 app.post('/webhook/orders/create', handleShopifyWebhook);
