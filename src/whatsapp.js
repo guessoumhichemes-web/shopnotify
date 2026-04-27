@@ -24,7 +24,8 @@ let isReady = false;
 let myNumber = null;
 let reconnectAttempts = 0;
 
-const SESSION_DIR = path.resolve(process.cwd(), '.wa_session_baileys');
+const DATA_DIR = process.env.DATA_DIR || '/data';
+const SESSION_DIR = path.join(DATA_DIR, '.wa_session_baileys');
 
 async function initWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
