@@ -6,12 +6,14 @@ const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-const dbPath = path.resolve(process.cwd(), 'shopnotify.db');
+const DATA_DIR = process.env.DATA_DIR || '/data';
+const dbPath = path.join(DATA_DIR, 'shopnotify.db');
 let db = null;
 let SQL = null;
 
 async function initDb() {
   SQL = await initSqlJs();
+      fs.mkdirSync(DATA_DIR, { recursive: true });
 
   // Load existing database or create new
   let data;
