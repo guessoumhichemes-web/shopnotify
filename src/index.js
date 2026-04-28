@@ -7,7 +7,7 @@ const { initDb } = require('./db');
 const { initWhatsApp, requestPairingCode, getStatus, sendConfirmation, sendManualMessage, startQR, startPairing, disconnectWhatsApp, setBotActive, getBotActive } = require('./whatsapp');
 const { handleShopifyWebhook } = require('./shopify');
 const { getPendingOrders, getStats } = require('./store');
-const { loadTemplates, saveTemplates, DEFAULT_TEMPLATES, loadSequence, saveSequence } = require('./templates');
+const { loadTemplates, saveTemplates, DEFAULT_TEMPLATES, loadSequence, saveSequence, validateSequence } = require('./templates');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -137,6 +137,14 @@ app.put('/api/sequence', (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// Validation synchrone de la séquence au démarrage
+const sequence = loadSequence();
+if (!validateSequence(sequence)) {
+  console.error('\n❌ ERREUR: Séquence invalide. Serveur non démarré.');
+  console.error('   Vérifiez: templates.json et data/sequence.json');
+  process.exit(1);
+}
 
 app.listen(PORT, () => {
   console.log(`\n🚀 ShopNotify démarré sur http://localhost:${PORT}`);

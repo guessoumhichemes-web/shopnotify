@@ -252,7 +252,8 @@ body {
 
 <!-- QR Overlay -->
 <div class="qr-overlay" id="qr-overlay" style="display:none;">
-  <div class="qr-modal">
+  <div class="qr-modal" style="position:relative;">
+    <button onclick="closeModal()" style="position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:10;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✕</button>
     <h2 id="modal-title">📱 Connecter WhatsApp</h2>
     <p id="modal-desc">Choisis ta méthode de connexion.</p>
 
@@ -300,10 +301,13 @@ body {
 
     <!-- Vue: Connecté -->
     <div id="view-connected" style="display:none">
-      <div style="text-align:center;margin-bottom:14px">
-        <div style="font-size:28px;margin-bottom:10px">🟢</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Connecté avec succès !</div>
-        <div style="font-size:12px;color:var(--muted);">+<span id="connected-phone">—</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="flex:1;text-align:center">
+          <div style="font-size:28px;margin-bottom:10px">🟢</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Connecté avec succès !</div>
+          <div style="font-size:12px;color:var(--muted);">+<span id="connected-phone">—</span></div>
+        </div>
+        <button onclick="closeConnectedView()" style="background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✕</button>
       </div>
       <button id="btn-toggle-bot" onclick="toggleBot()" style="width:100%;padding:11px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;margin-bottom:8px">✓ Actif</button>
       <button onclick="disconnectWA()" style="width:100%;padding:8px;border:0.5px solid var(--border);background:transparent;color:#ff6b6b;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit">🔴 Déconnecter</button>
@@ -551,7 +555,10 @@ body {
           <div class="config-title">📱 WhatsApp</div>
           <div class="field"><div class="field-label">Statut de connexion</div><input class="field-input" type="text" id="cfg-wa-status" readonly style="color:var(--green);" value="Chargement…" /></div>
           <div class="field"><div class="field-label">Numéro connecté</div><input class="field-input" type="text" id="cfg-wa-phone" readonly value="—" /></div>
-          <div style="margin-top:10px;"><button class="action-btn" onclick="showQR()" style="width:100%;text-align:center;">📱 Reconnecter WhatsApp</button></div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+            <button class="action-btn" onclick="showQR()" style="width:100%;text-align:center;">📱 Reconnecter WhatsApp</button>
+            <button id="btn-disconnect-config" onclick="disconnectWA()" style="width:100%;padding:8px;border:0.5px solid rgba(255,107,107,0.3);background:rgba(255,107,107,0.08);color:#ff6b6b;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;display:none;">🔴 Déconnecter</button>
+          </div>
         </div>
       </div>
       <div class="config-card">
@@ -571,6 +578,7 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+let modalOpen = false;  // Flag pour contrôler l'état du modal
 const COLORS = ['#25D366','#96BF48','#ffab00','#8baeff','#d884ff','#ff9f6b'];
 function initials(n){ return (n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
 function colorFor(n){ let h=0; for(let c of(n||'')) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
@@ -684,7 +692,7 @@ function sendMsg(){
   msgs.innerHTML+=`<div class="msg msg-bot">${val}<div class="msg-time">${t}</div></div>`;
   input.value=''; msgs.scrollTop=msgs.scrollHeight;
 }
-function showQR(){ document.getElementById('qr-overlay').style.display='flex'; showView('choice'); }
+function showQR(){ modalOpen = true; document.getElementById('qr-overlay').style.display='flex'; showView('choice'); }
 function showView(v){
   ['choice','pairing-form','qr','connected'].forEach(id=>{const el=document.getElementById('view-'+id); if(el) el.style.display='none';});
   const el=document.getElementById('view-'+v);
@@ -716,6 +724,7 @@ async function startPairingMode(){
 }
 async function pollQRCode(){
   for(let i=0;i<60;i++){
+    if(!modalOpen) return;  // Stop si modal fermé
     await new Promise(r=>setTimeout(r,500));
     const s=await fetch('/api/whatsapp/status').then(r=>r.json()).catch(()=>({}));
     if(s.qr){ document.getElementById('qr-content').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`; }
@@ -725,16 +734,27 @@ async function pollQRCode(){
 async function pollPairingCode(){
   const btn=document.getElementById('btn-gencode');
   for(let i=0;i<120;i++){
+    if(!modalOpen) return;  // Stop si modal fermé
     await new Promise(r=>setTimeout(r,500));
     const s=await fetch('/api/whatsapp/status').then(r=>r.json()).catch(()=>({}));
     if(s.pairingCode){ document.getElementById('pairing-code-display').textContent=s.pairingCode; document.getElementById('pairing-result').style.display='block'; }
     if(s.status==='connected'){ updateConnectedView(s); return; }
   }
-  btn.disabled=false; btn.textContent='Générer';
+  if(modalOpen) { btn.disabled=false; btn.textContent='Générer'; }
 }
 function updateConnectedView(status){
+  if(!modalOpen) return;  // Stop si modal fermé
   if(status.phone){ document.getElementById('connected-phone').textContent=status.phone; }
   showView('connected');
+}
+function closeConnectedView(){
+  const overlay = document.getElementById('qr-overlay');
+  if(overlay) overlay.style.display = 'none';
+}
+function closeModal(){
+  modalOpen = false;
+  const overlay = document.getElementById('qr-overlay');
+  if(overlay) overlay.style.display = 'none';
 }
 async function disconnectWA(){
   if(!confirm('Êtes-vous sûr de vouloir déconnecter WhatsApp ?')) return;
@@ -822,22 +842,38 @@ async function loadStats() {
 
 // ─── SÉQUENCE ───────────────────────────────────────────
 let allSequence = [];
+let lastSavedSequence = [];
+let sequenceLoaded = false;
+
 async function loadSequenceEditor() {
   const lang = document.getElementById('sequence-lang').value;
-  const res = await fetch('/api/sequence');
-  allSequence = await res.json();
+
+  // Charge du serveur SEULEMENT la première fois
+  if (!sequenceLoaded) {
+    const res = await fetch('/api/sequence');
+    allSequence = await res.json();
+    sequenceLoaded = true;
+    lastSavedSequence = JSON.parse(JSON.stringify(allSequence));
+  }
+
   const container = document.getElementById('sequence-editor');
   container.innerHTML = '';
 
+  if (allSequence.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Aucune étape configurée. Cliquez "+ Ajouter une étape"</div>';
+    return;
+  }
+
   allSequence.forEach((step, idx) => {
-    const stepText = step.template && step.template[lang] ? step.template[lang] : 'Message non disponible';
+    const stepText = step.template && step.template[lang] ? step.template[lang] : '(aucun message)';
     const card = document.createElement('div');
     card.draggable = true;
-    card.style.cssText = 'background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:12px;cursor:move;transition:all 0.15s';
+    card.style.cssText = 'background:var(--surface2);border:0.5px solid rgba(37,211,102,0.3);border-radius:8px;padding:14px;cursor:move;transition:all 0.15s';
+
     card.onmouseover = () => card.style.borderColor = 'var(--green-border)';
-    card.onmouseout = () => card.style.borderColor = 'var(--border)';
+    card.onmouseout = () => card.style.borderColor = 'rgba(37,211,102,0.3)';
     card.ondragstart = (e) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('index', idx); };
-    card.ondragover = (e) => { e.preventDefault(); card.style.background = 'rgba(37,211,102,0.08)'; };
+    card.ondragover = (e) => { e.preventDefault(); card.style.background = 'rgba(37,211,102,0.12)'; };
     card.ondragleave = () => { card.style.background = 'var(--surface2)'; };
     card.ondrop = (e) => {
       e.preventDefault();
@@ -851,46 +887,99 @@ async function loadSequenceEditor() {
       card.style.background = 'var(--surface2)';
     };
 
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'display:flex;align-items:center;gap:8px';
+    const stepNum = document.createElement('div');
+    stepNum.style.cssText = 'width:28px;height:28px;border-radius:50%;background:rgba(37,211,102,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--green);font-size:12px';
+    stepNum.textContent = idx + 1;
+    const titleSpan = document.createElement('div');
+    titleSpan.style.cssText = 'font-weight:600;font-size:13px';
+    titleSpan.textContent = step.label || `Étape ${idx + 1}`;
+    titleDiv.appendChild(stepNum);
+    titleDiv.appendChild(titleSpan);
+
+    const delayDiv = document.createElement('div');
+    delayDiv.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)';
+    delayDiv.innerHTML = `<span style="font-weight:600;color:var(--green)">${step.delayHours}h</span><span>après démarrage</span>`;
+
+    header.appendChild(titleDiv);
+    header.appendChild(delayDiv);
+    card.appendChild(header);
+
+    // Formulaire d'édition
+    const form = document.createElement('div');
+    form.style.cssText = 'display:flex;flex-direction:column;gap:10px';
+
+    const delayLabel = document.createElement('label');
+    delayLabel.style.cssText = 'font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px';
+    delayLabel.textContent = 'Délai avant envoi (heures)';
     const delayInput = document.createElement('input');
     delayInput.type = 'number';
+    delayInput.min = '0';
     delayInput.value = step.delayHours || 0;
-    delayInput.style.cssText = 'width:50px;padding:4px 8px;border:0.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-size:11px';
-    delayInput.onchange = () => { allSequence[idx].delayHours = parseInt(delayInput.value); };
+    delayInput.style.cssText = 'width:60px;padding:6px 8px;border:0.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:12px;font-weight:600;font-family:inherit';
+    delayInput.onchange = () => { allSequence[idx].delayHours = parseInt(delayInput.value) || 0; };
+
+    form.appendChild(delayLabel);
+    form.appendChild(delayInput);
+
+    const msgLabel = document.createElement('label');
+    msgLabel.style.cssText = 'font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px';
+    msgLabel.textContent = `Message (${lang === 'fr' ? '🇫🇷 Français' : '🇪🇸 Espagnol'})`;
+    form.appendChild(msgLabel);
 
     const textarea = document.createElement('textarea');
     textarea.value = stepText;
-    textarea.rows = 3;
-    textarea.style.cssText = 'width:100%;padding:8px;border:0.5px solid var(--border);border-radius:4px;font-size:11px;background:var(--surface);color:var(--text);resize:vertical;box-sizing:border-box;margin-top:8px;margin-bottom:8px';
+    textarea.rows = 4;
+    textarea.placeholder = 'Entrez votre message...';
+    textarea.style.cssText = 'width:100%;padding:10px;border:0.5px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface);color:var(--text);resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5';
     textarea.onchange = () => {
       if (!allSequence[idx].template) allSequence[idx].template = {};
       allSequence[idx].template[lang] = textarea.value;
     };
+    form.appendChild(textarea);
 
+    // Prévisualisation
+    const previewDiv = document.createElement('div');
+    previewDiv.style.cssText = 'background:rgba(37,211,102,0.06);border:0.5px solid rgba(37,211,102,0.2);border-radius:6px;padding:10px;margin-top:8px';
+    const previewLabel = document.createElement('div');
+    previewLabel.style.cssText = 'font-size:10px;color:#25D366;font-weight:600;margin-bottom:6px;text-transform:uppercase';
+    previewLabel.textContent = '👁 Aperçu';
+    previewDiv.appendChild(previewLabel);
+    const previewText = document.createElement('div');
+    previewText.style.cssText = 'font-size:11px;color:#c8e6cc;line-height:1.6;white-space:pre-wrap;word-break:break-word';
+    previewText.textContent = stepText || '(vide)';
+    textarea.onchange = () => {
+      previewText.textContent = textarea.value || '(vide)';
+    };
+    previewDiv.appendChild(previewText);
+    form.appendChild(previewDiv);
+
+    // Bouton supprimer
     const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Supprimer';
-    deleteBtn.style.cssText = 'padding:4px 12px;border:0.5px solid rgba(255,107,107,0.3);background:transparent;color:#ff6b6b;border-radius:4px;font-size:11px;cursor:pointer;transition:all 0.15s';
-    deleteBtn.onclick = () => { allSequence.splice(idx, 1); loadSequenceEditor(); };
+    deleteBtn.textContent = '🗑️ Supprimer cette étape';
+    deleteBtn.style.cssText = 'padding:8px 12px;border:0.5px solid rgba(255,107,107,0.4);background:transparent;color:#ff6b6b;border-radius:6px;font-size:12px;cursor:pointer;transition:all 0.15s;font-family:inherit;font-weight:600;margin-top:8px';
+    deleteBtn.onmouseover = () => deleteBtn.style.background = 'rgba(255,107,107,0.08)';
+    deleteBtn.onmouseout = () => deleteBtn.style.background = 'transparent';
+    deleteBtn.onclick = () => {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette étape ?')) {
+        allSequence.splice(idx, 1);
+        loadSequenceEditor();
+      }
+    };
+    form.appendChild(deleteBtn);
 
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div style="font-weight:600;font-size:12px">${step.label}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <label style="font-size:11px;color:var(--muted)">Délai (h):</label>
-        </div>
-      </div>
-    `;
-    card.appendChild(delayInput);
-    card.appendChild(textarea);
-    card.appendChild(deleteBtn);
+    card.appendChild(form);
+    container.appendChild(card);
 
     if (idx < allSequence.length - 1) {
       const arrow = document.createElement('div');
-      arrow.textContent = '↓';
-      arrow.style.cssText = 'text-align:center;color:var(--muted);font-size:16px;padding:4px';
-      container.appendChild(card);
+      arrow.textContent = '⬇️';
+      arrow.style.cssText = 'text-align:center;color:var(--muted);font-size:18px;padding:12px 0;font-weight:300';
       container.appendChild(arrow);
-    } else {
-      container.appendChild(card);
     }
   });
 }
@@ -902,18 +991,59 @@ async function addSequenceStep() {
     delayHours: 0,
     template: { fr: '', es: '' }
   });
-  const lang = document.getElementById('sequence-lang').value;
   loadSequenceEditor();
+  toast('✅ Nouvelle étape ajoutée');
 }
 
 async function saveSequence() {
-  const res = await fetch('/api/sequence', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(allSequence)
-  });
-  if (res.ok) toast('✅ Séquence sauvegardée !');
-  else toast('❌ Erreur de sauvegarde', false);
+  // Validation
+  let hasError = false;
+  let errorMsg = '';
+
+  for (let i = 0; i < allSequence.length; i++) {
+    const step = allSequence[i];
+    if (!step.template || (!step.template.fr && !step.template.es)) {
+      hasError = true;
+      errorMsg = `❌ Étape ${i + 1}: Veuillez entrer un message en français ou en espagnol`;
+      break;
+    }
+    if (step.delayHours === undefined || step.delayHours < 0) {
+      hasError = true;
+      errorMsg = `❌ Étape ${i + 1}: Le délai doit être 0 ou plus`;
+      break;
+    }
+  }
+
+  if (hasError) {
+    toast(errorMsg, false);
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/sequence', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allSequence)
+    });
+
+    if (res.ok) {
+      lastSavedSequence = JSON.parse(JSON.stringify(allSequence));
+      sequenceLoaded = false; // Recharge du serveur la prochaine fois
+      toast('✅ Séquence sauvegardée avec succès!');
+    } else {
+      const err = await res.json();
+      toast('❌ Erreur: ' + (err.error || 'Sauvegarde échouée'), false);
+    }
+  } catch (e) {
+    toast('❌ Erreur réseau: ' + e.message, false);
+  }
+}
+
+// ─── TEMPLATES EDITOR (MAIN FUNCTION) ───────────────────────────────────────────
+async function loadTemplateEditor() {
+  // Charge BOTH la séquence ET les réponses
+  await loadSequenceEditor();
+  await loadResponseEditor();
 }
 
 // ─── TEMPLATES (RÉPONSES) ───────────────────────────────────────────
@@ -940,25 +1070,89 @@ async function loadResponseEditor() {
     const value = allTemplates[lang]?.[key] || '';
     const vars = RESPONSE_VARS[key];
     const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:20px';
-    const varButtons = vars.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-      ${vars.map(v => `<span onclick="insertResponseVar('${key}','${v}')" title="Cliquer pour insérer" style="cursor:pointer;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;font-family:monospace;transition:all 0.15s;user-select:none" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--text)'">${v}</span>`).join('')}
-    </div>` : '';
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-        <div>
-          <div style="font-weight:600;font-size:14px">${info.icon} ${info.label}</div>
-          <div style="color:var(--muted);font-size:12px;margin-top:2px">${info.desc}</div>
-        </div>
-        ${varButtons}
-      </div>
-      <textarea id="resp-${key}" rows="4"
-        style="width:100%;padding:12px;border:0.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.5;background:var(--surface2);color:var(--text);outline:none"
-        onkeydown="if(event.keyCode===9){event.preventDefault();const ta=this;const start=ta.selectionStart;ta.value=ta.value.slice(0,start)+'  '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=start+2;}"
-        placeholder="Message…">${value}</textarea>
-    `;
+    card.style.cssText = 'background:var(--surface);border:0.5px solid rgba(37,211,102,0.2);border-radius:12px;padding:20px;margin-bottom:14px';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'flex:1';
+    const titleH = document.createElement('div');
+    titleH.style.cssText = 'font-weight:600;font-size:14px;margin-bottom:4px';
+    titleH.innerHTML = `${info.icon} ${info.label}`;
+    titleDiv.appendChild(titleH);
+
+    const descDiv = document.createElement('div');
+    descDiv.style.cssText = 'color:var(--muted);font-size:11px;line-height:1.4';
+    descDiv.textContent = info.desc;
+    titleDiv.appendChild(descDiv);
+
+    header.appendChild(titleDiv);
+
+    if (vars.length > 0) {
+      const varDiv = document.createElement('div');
+      varDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end';
+      vars.forEach(v => {
+        const btn = document.createElement('button');
+        btn.textContent = v;
+        btn.style.cssText = 'cursor:pointer;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-family:monospace;transition:all 0.15s;user-select:none;color:var(--text);font-family:inherit';
+        btn.onclick = () => insertResponseVar(key, v);
+        btn.onmouseover = () => { btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)'; };
+        btn.onmouseout = () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--text)'; };
+        varDiv.appendChild(btn);
+      });
+      header.appendChild(varDiv);
+    }
+    card.appendChild(header);
+
+    const textareaWrapper = document.createElement('div');
+    textareaWrapper.style.cssText = 'margin-top:12px';
+
+    const textarea = document.createElement('textarea');
+    textarea.id = `resp-${key}`;
+    textarea.value = value;
+    textarea.rows = 3;
+    textarea.placeholder = 'Entrez votre message…';
+    textarea.style.cssText = 'width:100%;padding:12px;border:0.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;line-height:1.5;background:var(--surface2);color:var(--text);outline:none;margin-bottom:10px';
+    textarea.onkeydown = (e) => {
+      if (e.keyCode === 9) {
+        e.preventDefault();
+        const start = textarea.selectionStart;
+        textarea.value = textarea.value.slice(0, start) + '  ' + textarea.value.slice(textarea.selectionEnd);
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }
+    };
+
+    textareaWrapper.appendChild(textarea);
+
+    // Aperçu
+    const previewDiv = document.createElement('div');
+    previewDiv.style.cssText = 'background:rgba(37,211,102,0.06);border:0.5px solid rgba(37,211,102,0.2);border-radius:6px;padding:10px';
+    const previewLabel = document.createElement('div');
+    previewLabel.style.cssText = 'font-size:10px;color:#25D366;font-weight:600;margin-bottom:6px;text-transform:uppercase';
+    previewLabel.textContent = '👁 Aperçu';
+    previewDiv.appendChild(previewLabel);
+
+    const previewText = document.createElement('div');
+    previewText.style.cssText = 'font-size:11px;color:#c8e6cc;line-height:1.6;white-space:pre-wrap;word-break:break-word';
+    previewText.textContent = value || '(vide)';
+    textarea.onchange = () => { previewText.textContent = textarea.value || '(vide)'; };
+    textarea.oninput = () => { previewText.textContent = textarea.value || '(vide)'; };
+    previewDiv.appendChild(previewText);
+
+    textareaWrapper.appendChild(previewDiv);
+    card.appendChild(textareaWrapper);
     container.appendChild(card);
   }
+
+  // Bouton de sauvegarde
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = '💾 Sauvegarder les messages';
+  saveBtn.style.cssText = 'width:100%;padding:12px;border:0.5px solid var(--green-border);background:var(--green-dim);color:var(--green);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.15s;margin-top:14px';
+  saveBtn.onmouseover = () => saveBtn.style.background = 'rgba(37,211,102,0.2)';
+  saveBtn.onmouseout = () => saveBtn.style.background = 'var(--green-dim)';
+  saveBtn.onclick = () => saveTemplates();
+  container.appendChild(saveBtn);
 }
 
 function insertResponseVar(key, variable) {
@@ -972,17 +1166,33 @@ function insertResponseVar(key, variable) {
 
 async function saveTemplates() {
   const lang = document.getElementById('response-lang').value;
+
+  // Validation
   for (const key of Object.keys(RESPONSE_LABELS)) {
     const ta = document.getElementById(`resp-${key}`);
+    if (ta && ta.value.trim().length === 0) {
+      toast(`❌ Le message "${RESPONSE_LABELS[key].label}" ne peut pas être vide`, false);
+      return;
+    }
     if (ta) allTemplates[lang][key] = ta.value;
   }
-  const res = await fetch('/api/templates', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(allTemplates)
-  });
-  if (res.ok) toast('✅ Templates sauvegardés !');
-  else toast('❌ Erreur de sauvegarde', false);
+
+  try {
+    const res = await fetch('/api/templates', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allTemplates)
+    });
+
+    if (res.ok) {
+      toast('✅ Messages de réponse sauvegardés !');
+    } else {
+      const err = await res.json();
+      toast('❌ Erreur: ' + (err.error || 'Sauvegarde échouée'), false);
+    }
+  } catch (e) {
+    toast('❌ Erreur réseau: ' + e.message, false);
+  }
 }
 
 async function resetTemplates() {
@@ -1016,20 +1226,21 @@ async function pollWA(){
       document.getElementById('sidebar-status').textContent=isActive?'En ligne':'Désactivé';
       document.getElementById('cfg-wa-status').value='✅ Connecté';
       document.getElementById('cfg-wa-phone').value=`+${s.phone}`;
-      if(overlay.style.display==='flex' && document.getElementById('view-connected').style.display==='block'){
-        updateConnectedView(s);
-      } else {
-        overlay.style.display='none';
-      }
+      document.getElementById('connected-phone').textContent=s.phone;
+      document.getElementById('btn-disconnect-config').style.display='block';
+      // Keep overlay hidden when connected, only show on explicit user action
+      overlay.style.display='none';
     } else if(s.status==='qr'){
       badge.className='wa-badge qr';
       badgeText.textContent='Scanner le QR';
       document.getElementById('sidebar-phone').textContent='Non connecté';
       document.getElementById('sidebar-status').textContent='En attente du scan';
-      overlay.style.display='flex';
-      showView('qr');
-      if(s.qr){
-        document.getElementById('qr-content').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`;
+      if(modalOpen){
+        overlay.style.display='flex';
+        showView('qr');
+        if(s.qr){
+          document.getElementById('qr-content').innerHTML=`<div class="qr-img-wrap"><img src="${s.qr}" alt="QR" /></div>`;
+        }
       }
     } else {
       badge.className='wa-badge disconnected';
@@ -1038,8 +1249,8 @@ async function pollWA(){
       document.getElementById('sidebar-status').textContent='Hors ligne';
       document.getElementById('cfg-wa-status').value='❌ Déconnecté';
       document.getElementById('cfg-wa-phone').value='—';
-      overlay.style.display='flex';
-      showView('choice');
+      document.getElementById('btn-disconnect-config').style.display='none';
+      // Ne pas ouvrir le modal automatiquement — l'utilisateur choisit quand se connecter
     }
   } catch {}
 }

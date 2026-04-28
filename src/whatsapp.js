@@ -237,11 +237,8 @@ async function sendConfirmation(orderId) {
 
   // Envoyer le 1er message (confirmation)
   if (sequence.length > 0) {
-    const firstStep = sequence[0];
-    const template = firstStep.template;
-    const message = template && template[lang]
-      ? template[lang].replace ? template[lang] : getMessage('confirmation', lang, vars)
-      : getMessage('confirmation', lang, vars);
+    // ✅ FIX: Toujours utiliser getMessage() pour rendre les variables correctement
+    const message = getMessage('confirmation', lang, vars);
 
     await sock.sendMessage(jid, { text: message }); // ← Structure Baileys: { text: ... }
     updateOrderStatus(orderId, 'sent', { lang });
@@ -263,10 +260,8 @@ async function sendConfirmation(orderId) {
       }
 
       try {
-        const template = step.template;
-        const message = template && template[lang]
-          ? template[lang].replace ? template[lang] : getMessage(step.id, lang, vars)
-          : getMessage(step.id, lang, vars);
+        // ✅ FIX: Toujours utiliser getMessage() pour rendre les variables correctement
+        const message = getMessage(step.id, lang, vars);
 
         await sock.sendMessage(jid, { text: message }); // ← Structure Baileys
         updateOrderStatus(orderId, 'reminded');

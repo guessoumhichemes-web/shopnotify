@@ -134,7 +134,10 @@ const DEFAULT_SEQUENCE = [
     id: 'confirmation',
     label: 'Message de confirmation',
     delayHours: 0,
-    template: DEFAULT_TEMPLATES
+    template: {
+      fr: DEFAULT_TEMPLATES.fr.confirmation,
+      es: DEFAULT_TEMPLATES.es.confirmation
+    }
   },
   {
     id: 'reminder',
@@ -170,6 +173,52 @@ function saveSequence(sequence) {
   fs.writeFileSync(SEQUENCE_FILE_ENV, JSON.stringify(sequence, null, 2), 'utf8');
 }
 
+// Valide la séquence avant utilisation
+function validateSequence(sequence) {
+  if (!Array.isArray(sequence) || sequence.length === 0) {
+    console.warn('⚠️  Séquence vide ou invalide');
+    return false;
+  }
+
+  const templates = loadTemplates();
+  const langs = Object.keys(templates);
+
+  for (let i = 0; i < sequence.length; i++) {
+    const step = sequence[i];
+
+    // Check: id est une string
+    if (typeof step.id !== 'string' || !step.id.trim()) {
+      console.error(`❌ Étape ${i}: id manquant ou invalide`);
+      return false;
+    }
+
+    // Check: delayHours est un nombre valide
+    if (typeof step.delayHours !== 'number' || step.delayHours < 0) {
+      console.error(`❌ Étape '${step.id}': delayHours doit être un nombre ≥ 0, reçu: ${step.delayHours}`);
+      return false;
+    }
+
+    // Check: template existe pour chaque langue
+    for (const lang of langs) {
+      const msg = getMessage(step.id, lang, {
+        name: 'TEST',
+        orderNumber: '0',
+        shop: 'test',
+        items: '',
+        total: '0',
+        address: 'test'
+      });
+      if (!msg || msg.trim() === '') {
+        console.error(`❌ Étape '${step.id}': pas de template pour la langue '${lang}'`);
+        return false;
+      }
+    }
+  }
+
+  console.log(`✅ Séquence validée: ${sequence.length} étape(s)`);
+  return true;
+}
+
 module.exports = {
   loadTemplates,
   saveTemplates,
@@ -178,5 +227,6 @@ module.exports = {
   DEFAULT_TEMPLATES,
   loadSequence,
   saveSequence,
-  DEFAULT_SEQUENCE
+  DEFAULT_SEQUENCE,
+  validateSequence
 };
