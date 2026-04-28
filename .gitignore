@@ -1,8 +1,16 @@
 node_modules/
 .env
 .env.local
+.env.*.local
 shopnotify.db*
 .wa_session_baileys/
+.wa_session/
+.wwebjs_cache/
+graphify-out/
+.claude/
 templates.json
 *.log
 .DS_Store
+.DS_Store?
+*.swp
+*.swo
