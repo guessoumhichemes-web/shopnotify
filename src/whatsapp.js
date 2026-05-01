@@ -240,9 +240,15 @@ async function sendConfirmation(orderId) {
     // ✅ FIX: Toujours utiliser getMessage() pour rendre les variables correctement
     const message = getMessage('confirmation', lang, vars);
 
-    await sock.sendMessage(jid, { text: message }); // ← Structure Baileys: { text: ... }
-    updateOrderStatus(orderId, 'sent', { lang });
-    console.log(`📤 Message envoyé à ${order.customerName} (${phone})`);
+    try {
+      await sock.sendMessage(jid, { text: message }); // ← Structure Baileys: { text: ... }
+      updateOrderStatus(orderId, 'sent', { lang });
+      console.log(`📤 Message envoyé à ${order.customerName} (${phone})`);
+    } catch (err) {
+      console.error(`❌ Erreur envoi message confirmation pour #${order.shopifyId} (${phone}): ${err.message}`);
+      updateOrderStatus(orderId, 'failed', { error: err.message, lang });
+      throw err;
+    }
   }
 
   // Programmer les messages suivants
