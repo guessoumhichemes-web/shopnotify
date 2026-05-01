@@ -28,7 +28,8 @@ let botActive = true;
 let intentionalStop = false; // Prevents auto-reconnect on manual stop
 
 const DATA_DIR = process.env.DATA_DIR || '/data';
-const SESSION_DIR = path.join(DATA_DIR, '.wa_session_baileys');
+// SESSION_DIR est toujours sur le volume persistant (/data) pour survivre aux redéploiements
+const SESSION_DIR = path.join('/data', '.wa_session_baileys');
 
 // Générer un pairing code via le socket Baileys
 async function requestPairingCode(phoneNumber) {
